@@ -1,4 +1,7 @@
 import { Paper } from "../models/index.js";
+import { Conference } from "../models/Conference.js";
+import { Author } from "../models/Author.js";
+import { User } from "../models/User.js";
 
 export const controller = {
   createPaper: async (req, res) => {
@@ -42,7 +45,8 @@ export const controller = {
       res.status(500).send(`Eroare la preluarea tuturor lucrarilor ${err}`);
     }
   },
-
+  //de modificat -> rectificam cautarea=>
+  // {se cauata prima in tabela authors si dupa ce gasim acesti autori cautam hartiile :))))}
   getAllPapersByAuthor: async (req, res) => {
     try {
       const authorId = req.params.id;
@@ -66,7 +70,7 @@ export const controller = {
 
   getPapersByConferenceId: async (req, res) => {
     try {
-      const conferenceId = req.papers.id;
+      const conferenceId = req.params.id;
 
       const papers = await Paper.findAll({
         where: { conferenceId: conferenceId },

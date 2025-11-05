@@ -31,6 +31,9 @@ Paper.belongsTo(Conference, {foreignKey:"conferenceId"});
 User.belongsToMany(Paper, {through: Author, foreignKey:"userId", as: "paperAuthored"});
 Paper.belongsToMany(User, {through: Author, foreignKey:"paperId", as:"authors"});
 
+//paper-author-user
+Author.belongsTo(User, { foreignKey: "userId" });
+Author.belongsTo(Paper, { foreignKey: "paperId" });
 
 //reviesws
 

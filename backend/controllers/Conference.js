@@ -15,7 +15,7 @@ export const controller = {
       return rs.status(201).json(newConference);
     } catch (error) {
       console.log("Error creating conference!");
-      return res.status(500).send(`Can't create conference : ${err}`);
+      return res.status(500).send(`Can't create conference : ${error}`);
     }
   },
 
@@ -30,7 +30,7 @@ export const controller = {
       return res.status(200).json(conferences);
     } catch (error) {
       console.log("Couldn't fetch conferences!");
-      return res.status(500).send(`Couldn't fetch conferences:${err}`);
+      return res.status(500).send(`Couldn't fetch conferences:${error}`);
     }
   },
 
@@ -41,10 +41,10 @@ export const controller = {
       if (!conference) {
         return res.status(404).json("Failed to fetch conferences!");
       }
-      return res.status(200).json(conferences);
+      return res.status(200).json(conference);
     } catch (error) {
       console.log("Couldn't fetch conference!");
-      return res.status(500).send(`Couldn't fetch conference:${err}`);
+      return res.status(500).send(`Couldn't fetch conference:${error}`);
     }
   },
   deleteConferenceById: async (req, res) => {
@@ -95,7 +95,7 @@ export const controller = {
       return res.status(200).send(conferences);
     } catch (error) {
       console.log("Couldn't fetch conference!");
-      return res.status(500).send(`Couldn't fetch conference:${err}`);
+      return res.status(500).send(`Couldn't fetch conference:${error}`);
     }
   },
 };

@@ -8,7 +8,7 @@ router.get(
   controllers.conferenceController.getConferenceById
 );
 router.get(
-  "/Conference/:organiser",
+  "/organiserConference/:id",
   controllers.conferenceController.getAllConferenceByOrganiserId
 );
 router.delete(
