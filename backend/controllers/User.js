@@ -66,9 +66,11 @@ export const controller = {
       if (reviewers.length === 0) {
         return res.status(404).send("Nu s-au gasit useri cu rolul de reviewer");
       }
-      return res.status(200).send(reviewrs);
+      return res.status(200).send(reviewers);
     } catch (err) {
       res.status(500).send(`Eroare la preluare revieweri: ${err}`);
     }
   },
 };
+
+//mai trebuie facut authController ca nu avem login updatePassword etc

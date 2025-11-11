@@ -7,7 +7,7 @@ export const controller = {
     try {
       const { feedback, decision, paperId, userId } = req.body;
       if (!feedback || !decision || !paperId || !userId)
-        return res.status(200).send("Must complete all values!");
+        return res.status(400).send("Must complete all values!");
       const review = await Review.create({
         feedback,
         decision: decision || "REVISE",
@@ -15,24 +15,24 @@ export const controller = {
         userId,
       });
       return res.status(201).send(review);
-    } catch (error) {
+    } catch (err) {
       return res.status(500).send(`Eroare la creare review: ${err}`);
     }
   },
   getAllReviewsByReviewer: async (req, res) => {
     try {
-      const reviewerId = req.params.body;
+      const reviewerId = req.params.id;
       const reviews = await Review.findAll({ where: { userId: reviewerId } });
       if (reviews.length === 0)
         return res.status(404).send("Nu am gasit reviewuri");
       return res.status(200).send(reviews);
     } catch (err) {
-      return res.status(500).send(`Eroare la creare review: ${err}`);
+      return res.status(500).send(`Eroare la preluare review-uri: ${err}`);
     }
   },
-  getAllReviewsByPapaperId: async (req, res) => {
+  getAllReviewsByPaperId: async (req, res) => {
     try {
-      const paperId = req.params.body;
+      const paperId = req.params.id;
       const reviews = await Review.findAll({ where: { paperId: paperId } });
       if (reviews.length === 0)
         return res.status(404).send("Nu am gasit reviewuri");
@@ -43,11 +43,11 @@ export const controller = {
   },
   updateReview: async (req, res) => {
     try {
-      const reviewId = req.params.body;
+      const reviewId = req.params.id;
       const updateData = req.body;
       const updatedRows = await Review.update({
-        where: { id: reviewId },
         updateData,
+        where: { id: reviewId },
       });
       if (updatedRows === 0) return res.status(404).send(`No data to update!`);
       const review = await Review.findByPk(reviewId);
