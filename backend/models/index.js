@@ -8,39 +8,41 @@ import { Conference } from './Conference.js'
 import { Author } from './Author.js'
 
 //organizer -> conference
-Conference.belongsTo(User, {as: "organiser", foreignKey: "organiserId"});
-User.hasMany(Conference, {as: "organisedConferences", foreignKey: "organiserId"});
+Conference.belongsTo(User, {as: "organiser", foreignKey: "organiserId",onDelete: "CASCADE"});
+User.hasMany(Conference, {as: "organisedConferences", foreignKey: "organiserId",onDelete: "CASCADE"});
 
 //conference_attendence
 User.belongsToMany(Conference, {
     through: ConferenceAttendance,
     foreignKey: "userId",
     as: "attendedConferences",
+    onDelete: "CASCADE"
 });
 Conference.belongsToMany(User, {
     through: ConferenceAttendance,
     foreignKey: "conferenceId",
     as: "participants",
+    onDelete: "CASCADE"
 });
 
 //conference -> papers
-Conference.hasMany(Paper, {foreignKey: "conferenceId"});
-Paper.belongsTo(Conference, {foreignKey:"conferenceId"});
+Conference.hasMany(Paper, {foreignKey: "conferenceId",onDelete: "CASCADE"});
+Paper.belongsTo(Conference, {foreignKey:"conferenceId",onDelete: "CASCADE"});
 
 //authors
-User.belongsToMany(Paper, {through: Author, foreignKey:"userId", as: "paperAuthored"});
-Paper.belongsToMany(User, {through: Author, foreignKey:"paperId", as:"authors"});
+User.belongsToMany(Paper, {through: Author, foreignKey:"userId", as: "paperAuthored",onDelete: "CASCADE"});
+Paper.belongsToMany(User, {through: Author, foreignKey:"paperId", as:"authors",onDelete: "CASCADE"});
 
 //paper-author-user
-Author.belongsTo(User, { foreignKey: "userId" });
-Author.belongsTo(Paper, { foreignKey: "paperId" });
+Author.belongsTo(User, { foreignKey: "userId" ,onDelete: "CASCADE"});
+Author.belongsTo(Paper, { foreignKey: "paperId",onDelete: "CASCADE" });
 
 //reviesws
 
-User.hasMany(Review,{foreignKey:"userId",as:"reviewGiven"});
-Review.belongsTo(User,{foreignKey:"userId",as:"reviewer"});
+User.hasMany(Review,{foreignKey:"userId",as:"reviewGiven",onDelete: "CASCADE"});
+Review.belongsTo(User,{foreignKey:"userId",as:"reviewer",onDelete: "CASCADE"});
 
-Paper.hasMany(Review,{foreignKey:"paperId",as:"paperReviews"});
-Review.belongsTo(Paper,{foreignKey:"paperId"});
+Paper.hasMany(Review,{foreignKey:"paperId",as:"paperReviews",onDelete: "CASCADE"});
+Review.belongsTo(Paper,{foreignKey:"paperId",onDelete: "CASCADE"});
 
 export {db,User,Conference,ConferenceAttendance,Paper,Author,Review};

@@ -13,7 +13,7 @@ export const controller = {
       }
 
       const newPaper = await Paper.create({
-        totle,
+        title,
         conferenceId,
         fileUrl,
         status: status || "under_review",
@@ -45,18 +45,21 @@ export const controller = {
       res.status(500).send(`Eroare la preluarea tuturor lucrarilor ${err}`);
     }
   },
-  //de modificat -> rectificam cautarea=>
-  // {se cauata prima in tabela authors si dupa ce gasim acesti autori cautam hartiile :))))}
+  
   getAllPapersByAuthor: async (req, res) => {
     try {
       const authorId = req.params.id;
-
+      
       const papers = await Paper.findAll({
-        where: { authorId: authorId },
-        include: {
-          model: Conference,
-          attributes: ["id"],
-        },
+        include: [
+          {
+            model: User,
+            as: "authors",
+            where: { id: authorId },
+             attributes: ["id", "name", "email"],
+            through: { attributes: ["isMainAuthor"] },
+          },
+        ],
       });
 
       if (papers.length === 0) {
@@ -108,7 +111,7 @@ export const controller = {
           title: title ?? paper.title,
           fileUrl: fileUrl ?? paper.fileUrl,
         });
-      } else if (userRole === "reviewr") {
+      } else if (userRole === "reviewer") {
         await paper.update({
           status: status ?? paper.status,
         });
