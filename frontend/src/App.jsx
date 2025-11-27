@@ -1,9 +1,8 @@
 import "./App.css";
 import { Routes, Route } from "react-router-dom";
+import AppRouter from "./routes/AppRouter.jsx";
 function App() {
-  const [count, setCount] = useState(0);
-
-  return <>{/* <Routes>rutele</Routes> */}</>;
+  return <AppRouter />;
 }
 
 export default App;
