@@ -1,0 +1,59 @@
+.addPaperWrapper {
+  min-width: 100vw;
+  min-height: 100vh;
+  background: linear-gradient(45deg, #f4c5d7 0%, #e6d0d8 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.addPaperCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.addPaperTitle {
+  margin-bottom: 1.5rem;
+  color: #C76C8F;
+}
+
+.label {
+  margin-top: 1.2rem;
+  margin-bottom: 0.4rem;
+  display: block;
+  color: #444;
+  font-size: 0.95rem;
+}
+
+.fileInput {
+  margin: 8px 0 20px 0;
+}
+
+.btnSubmit {
+  background-color: #D884A7 !important;
+  color: white !important;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+
+/* ======== MOBILE VERSION ======== */
+
+@media (max-width: 900px) {
+  .addPaperWrapper {
+    padding: 1.5rem;
+  }
+
+  .addPaperCard {
+    padding: 1.8rem;
+    max-width: 100%;
+  }
+
+  .addPaperTitle {
+    font-size: 1.5rem;
+  }
+}

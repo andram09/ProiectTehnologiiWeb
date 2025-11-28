@@ -1,0 +1,54 @@
+.authorWrapper {
+  background: #f7e9ef;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.contentArea {
+  margin-top: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.tableCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  max-width: 70%;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.paperTable {
+  margin: 2rem;
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.paperTable th,
+.paperTable td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.tableLink {
+  color: #b14c6c;
+  font-weight: 600;
+}
+
+.modifyBtn {
+  background-color: #b14c6c !important;
+  color: white !important;
+  padding: 3px 12px !important;
+  border-radius: 6px !important;
+}
+
+.addNewBtn {
+  margin: 1rem 1rem 1rem 2rem !important;
+  background: #923e57 !important;
+  color: white !important;
+  height: 40px;
+  border-radius: 8px !important;
+}

@@ -1,0 +1,40 @@
+.headerWrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #e7c2cb;
+  padding: 15px 25px;
+  border-radius: 12px;
+}
+
+.headerWelcome {
+  color: #8f455c;
+  margin: 0;
+}
+
+.headerTabs {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.headerTab {
+  text-decoration: none;
+  color: #7b3e4b;
+  font-weight: 600;
+}
+
+.logoutBtn {
+  background: #b14c6c;
+  color: white;
+  border: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.logoutBtn:hover {
+  background: #933a55;
+}
