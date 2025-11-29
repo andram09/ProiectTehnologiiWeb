@@ -28,7 +28,7 @@ export const User = db.define(
     },
   },
   {
-    tableName: "`user`",
+    tableName: "user",
     timestamps: true,
   }
 );
