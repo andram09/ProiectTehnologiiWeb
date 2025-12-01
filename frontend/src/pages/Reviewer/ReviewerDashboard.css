@@ -1,0 +1,46 @@
+.reviewerWrapper {
+  background: #f7e9ef;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.reviewerContent {
+  margin-top: 30px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.reviewerTableCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  width: 80%;
+  max-width: 1000px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+
+.reviewerTable {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.reviewerTable th,
+.reviewerTable td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+.tableLink {
+  color: #b14c6c;
+  font-weight: 600;
+}
+
+.addReviewBtn {
+  background: #b14c6c !important;
+  color: white !important;
+  border-radius: 6px !important;
+  padding: 4px 14px !important;
+}

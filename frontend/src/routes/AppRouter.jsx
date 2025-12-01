@@ -7,6 +7,10 @@ import AuthorAddPaper from "../pages/AuthorPages/AddPaper.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx"
 import AuthorDashboard from "../pages/AuthorPages/AuthorDashboard.jsx";
+import OrganizerDashBoard from "../pages/OrganizerPages/OrganizerDashboard.jsx"
+import ReviewerDashboard from "../pages/Reviewer/ReviewerDashboard.jsx";
+import AddReview from "../pages/Reviewer/AddReview.jsx";
+
 
 export default function AppRouter() {
   return (
@@ -30,6 +34,37 @@ export default function AppRouter() {
         <ProtectedRoute>
           <RoleRoute role="author">
           <AuthorDashboard/>
+          </RoleRoute>
+        </ProtectedRoute>
+      }
+      />
+      <Route
+      path="/organizer"
+      element={
+        <ProtectedRoute>
+          <RoleRoute role="organizer">
+          <OrganizerDashBoard/>
+          </RoleRoute>
+        </ProtectedRoute>
+      }
+      />
+      
+      <Route
+      path="/reviewer"
+      element={
+        <ProtectedRoute>
+          <RoleRoute role="reviewer">
+          <ReviewerDashboard/>
+          </RoleRoute>
+        </ProtectedRoute>
+      }
+      />
+      <Route
+      path="/reviewer/add/:id"
+      element={
+        <ProtectedRoute>
+          <RoleRoute role="reviewer">
+          <AddReview/>
           </RoleRoute>
         </ProtectedRoute>
       }

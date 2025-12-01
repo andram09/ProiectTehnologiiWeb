@@ -2,24 +2,26 @@ import { TextField, Button } from "@mui/material";
 import "./auth.css";
 import { useState } from "react";
 import { loginRequest } from "../../api/auth.js"
+import {useNavigate} from "react-router-dom"
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate=useNavigate();
+  
   const handleLogin = async () => {
     try {
       const data = await loginRequest(email, password);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
       if (data.user.role === "organizer") {
-        window.location.href = "/author";
+       navigate("/organizer");
       }
       else if (data.user.role === "reviewer") {
-        window.location.href = "/author";
+         navigate("/reviewer");
       }
       else {
-        window.location.href = "/author";
+         navigate("/author");
       }
     }
     catch (error) {
