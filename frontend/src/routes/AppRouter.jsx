@@ -8,8 +8,8 @@ import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx"
 import AuthorDashboard from "../pages/AuthorPages/AuthorDashboard.jsx";
 import OrganizerDashBoard from "../pages/OrganizerPages/OrganizerDashboard.jsx"
-import ReviewerDashboard from "../pages/Reviewer/ReviewerDashboard.jsx";
-import AddReview from "../pages/Reviewer/AddReview.jsx";
+import ReviewerDashboard from "../pages/ReviewerPages/ReviewerDashboard.jsx";
+import AddReview from "../pages/ReviewerPages/AddReview.jsx";
 
 
 export default function AppRouter() {
