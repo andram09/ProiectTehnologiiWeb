@@ -109,7 +109,14 @@ export default function OrganizerDashboard() {
                     There are no conferences yet.
                   </TableCell>
                 </TableRow>
-              ) : ((rowsPerPage>0?conferences.slice(page*rowsPerPage,page*rowsPerPage+rowsPerPage):conferences).map((conf)=>(
+              ) : (
+                (rowsPerPage > 0
+                  ? conferences.slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                  : conferences
+                ).map((conf) => (
                   <TableRow key={conf.id}>
                     <TableCell>{conf.title}</TableCell>
                     <TableCell>{conf.reviewers.length}</TableCell>
@@ -149,24 +156,24 @@ export default function OrganizerDashboard() {
                   </TableRow>
                 ))
               )}
-              {
-                emptyRpws>0&&(
-                  <TableRow style={{height:53*emptyRpws}}>
-                    <TableCell colSpan={6}/>
-                  </TableRow>
-                )
-              }
+              {emptyRpws > 0 && (
+                <TableRow style={{ height: 53 * emptyRpws }}>
+                  <TableCell colSpan={6} />
+                </TableRow>
+              )}
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TablePagination rowsPerPageOptions={[5,10,25,{label:"All",value:-1}]}
-                colSpan={5}
-                count={conferences.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onPageChange={handleChangePage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                ActionsComponent={TablePaginationActions}/>
+                <TablePagination
+                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
+                  colSpan={5}
+                  count={conferences.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  ActionsComponent={TablePaginationActions}
+                />
               </TableRow>
             </TableFooter>
           </Table>
@@ -191,6 +198,20 @@ export default function OrganizerDashboard() {
             <TextField
               name="description"
               label="Description"
+              fullWidth
+              required
+              variant="standard"
+            />
+            <TextField
+              name="date"
+              label="Date"
+              fullWidth
+              required
+              variant="standard"
+            />
+            <TextField
+              name="time"
+              label="Time"
               fullWidth
               required
               variant="standard"

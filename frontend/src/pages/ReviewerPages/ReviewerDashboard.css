@@ -1,4 +1,21 @@
-.reviewerWrapper {
+ .reviewerWrapper {
+  background: #f7e9ef;
+  height: 100vh;
+}
+.reviewerContent {
+  margin-top: 3rem;
+  flex-wrap: wrap;
+  gap:2rem;
+}
+
+.reviewerTableCard {
+  background: white;
+}
+
+
+@media(min-width:1250px)
+{
+  .reviewerWrapper {
   background: #f7e9ef;
   min-height: 100vh;
   min-width: 100vw;
@@ -43,4 +60,5 @@
   color: white !important;
   border-radius: 6px !important;
   padding: 4px 14px !important;
+}
 }

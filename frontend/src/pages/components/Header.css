@@ -4,7 +4,7 @@
   align-items: center;
   background: #e7c2cb;
   padding: 15px 25px;
-  border-radius: 12px;
+  position: relative;
 }
 
 .headerWelcome {
@@ -37,4 +37,77 @@
 
 .logoutBtn:hover {
   background: #933a55;
+}
+
+.hamburgerBtn {
+  display: none;
+}
+
+.closeBtn {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .headerWrapper {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0rem 0rem 0rem 0rem;
+  }
+
+  .headerWelcome{
+            text-align: left;
+  }
+
+  .hamburgerBtn {
+    display: block;
+    background: none;
+    border: none;
+    color: #8f455c;
+    font-size: 2rem;
+    cursor: pointer;
+    order: 2;
+    margin-left: auto;
+  }
+
+  .headerTabs {
+    position: fixed;
+    top: 0;
+    right:  0;
+    height: 100vh;
+    margin-top:-5rem;
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    width: 75%;
+    gap: 0;
+    text-align: center;
+    background-color: #f7e9ef;
+    z-index: 999;
+    padding-top: 80px;
+  }
+  .headerTabs.open {
+    transform: translateX(0);
+  }
+
+  .headerTab,
+  .logoutBtn {
+    width: 100%;
+    padding: 1rem 0;
+    border-top: 1px solid #ddd;
+    color: #7b3e4b;
+    background: none;
+  }
+   .closeBtn {
+    display: block;
+    background: none;
+    border: none;
+    color: #7b3e4b;
+    font-size: 2rem;
+    font-weight: bold;
+    align-self: flex-end;
+    margin: 1rem;
+    cursor: pointer;
+  }
 }
