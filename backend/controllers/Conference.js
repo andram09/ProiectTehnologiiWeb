@@ -1,18 +1,46 @@
-import { Conference } from "../models/Conference.js";
+import { Conference, User } from "../models/index.js";
 
 export const controller = {
   createConference: async (req, res) => {
     try {
-      const { title, description, organiserId } = req.body;
-      if (!title || !description || !organiserId) {
+      const { title, date, time, location, description, organiserId } =
+        req.body;
+      if (
+        !title ||
+        !description ||
+        !organiserId ||
+        !date ||
+        !time ||
+        !location
+      ) {
         return res.status(400).json({ error: "All fields must be completed!" });
       }
+      if (title.length < 3) {
+        return res.status(400).send("Title must be at least 3 characters long");
+      }
+      if (description.length < 10) {
+        return res
+          .status(400)
+          .send("Description must be at least 10 characters long");
+      }
+      if (location.length < 3) {
+        return res
+          .status(400)
+          .json({ error: "Location must be at least 3 characters long" });
+      }
+      //nu mai verific data si ora ca daca facem n frontend cu input special pt date si pt time ar trb sa fie ok
+
+      const organiser = await User.findByPk(organiserId);
+      if (!organiser) return res.status(404).send("Organiser doesnt exist");
       const newConference = await Conference.create({
         title,
-        decription,
+        date,
+        time,
+        location,
+        description,
         organiserId,
       });
-      return rs.status(201).json(newConference);
+      return res.status(201).json(newConference);
     } catch (error) {
       console.log("Error creating conference!");
       return res.status(500).send(`Can't create conference : ${error}`);
@@ -21,9 +49,7 @@ export const controller = {
 
   getAllConferences: async (req, res) => {
     try {
-      const conferences = await Conference.findAll({
-        attributes: ["id", "title", "description", "organiserId"],
-      });
+      const conferences = await Conference.findAll();
       if (conferences.length === 0) {
         return res.status(404).json("Failed to fetch conferences!");
       }
@@ -70,6 +96,37 @@ export const controller = {
     try {
       const conferenceId = req.params.id;
       const updatedConference = req.body;
+      if (
+        updatedConference.title !== undefined &&
+        updatedConference.title.length < 3
+      ) {
+        return res.status(400).send("Title must be at least 3 characters long");
+      }
+
+      if (
+        updatedConference.description !== undefined &&
+        updatedConference.description.length < 10
+      ) {
+        return res
+          .status(400)
+          .send("Description must be at least 10 characters long");
+      }
+
+      if (
+        updatedConference.location !== undefined &&
+        updatedConference.location.length < 3
+      ) {
+        return res
+          .status(400)
+          .send("Location must be at least 3 characters long");
+      }
+      if (updatedConference.organiserId) {
+        //daca schimbam si organizatoru verificam ca exista id ul ala inainte
+        const organiser = await User.findByPk(updatedConference.organiserId);
+        if (!organiser) {
+          return res.status(404).send("Organiser doesnt exist");
+        }
+      }
       const [updatedRows] = await Conference.update(updatedConference, {
         where: {
           id: conferenceId,
@@ -79,7 +136,9 @@ export const controller = {
         return res.status(404).send(`Conference not found to be updated`);
       }
       return res.status(200).send(updatedConference);
-    } catch (error) {}
+    } catch (error) {
+      return res.status(500).send(`Error while updating conference: ${error}`);
+    }
   },
   getAllConferenceByOrganiserId: async (req, res) => {
     try {

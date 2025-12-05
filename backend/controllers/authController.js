@@ -8,6 +8,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 export const controller = {
   addUser: async (req, res) => {
     const { name, email, password, role } = req.body;
+    if (!name || !email || !password || !role)
+      return res.status(400).send("Toate campurile sunt obligatorii");
     try {
       const result = await User.findOne({
         where: { email: email },
@@ -15,6 +17,27 @@ export const controller = {
       if (result) {
         return res.status(409).json(`Email ul: ${email} este deja folosit!`);
       }
+      if (!/^[a-zA-Z\s]{3,}$/.test(name)) {
+        //minim 3 caractere si doar litere mici si mari
+        res
+          .status(400)
+          .send("Numele trb sa aiba minim 3 caractere si sa aiba doar litere");
+      }
+      if (!/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
+        res.status(400).send("Email invalid");
+      } //traducere: mail-ul poate avea litere mici+mari +cifre + punct _-, dupa @ dupa litere mici mari+cifre si . -, dupa . si minim 2 litere pt domeniu: .com .ro
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecialCh = /[/!@#$%^&*()_\-+={}|\\:;"'<,>.?~`]/.test(password);
+      const isLongEnough = password.length > 8;
+      if (!hasUpperCase || !hasNumber || !hasSpecialCh || !isLongEnough) {
+        res.status(400).send("Parola invalida");
+      } //de afisat n front ce e gresit si ce trebuie sa modifice userul in formular
+      const roles = ["ORGANIZER", "AUTHOR", "REVIEWER"];
+      if (!roles.includes(role)) {
+        res.status(400).send("Rol invalid");
+      }
+
       const hashedPassword = await bcrypt.hash(password, 10);
       const user = await User.create({
         name: name,
@@ -30,7 +53,7 @@ export const controller = {
   loginUser: async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(400).send("Specifica email-ul si parola");
+      return res.status(400).send("Specifica email-ul si parola"); //nu cred ca mai trebuie alte validari aici
     }
     try {
       const user = await User.findOne({ where: { email: email } });
@@ -56,6 +79,24 @@ export const controller = {
 
       const user = await User.findOne({ where: { email: email } });
       if (!user) return res.status(404).send("User not found");
+      const arePasswordsIdentical = await bcrypt.compare(
+        password,
+        user.password
+      );
+
+      if (arePasswordsIdentical) {
+        res
+          .status(400)
+          .send("Noua parola trebuie sa fie diferita de cea veche~");
+      }
+      //validare parola noua
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecialCh = /[/!@#$%^&*()_\-+={}|\\:;"'<,>.?~`]/.test(password);
+      const isLongEnough = password.length > 8;
+      if (!hasUpperCase || !hasNumber || !hasSpecialCh || !isLongEnough) {
+        res.status(400).send("Parola invalida");
+      }
 
       const hashedPassword = await bcrypt.hash(password, 10);
       user.password = hashedPassword;
@@ -69,7 +110,7 @@ export const controller = {
   forgotPassword: async (req, res) => {
     try {
       const { email } = req.body;
-
+      if (!email) return res.status(400).send("Mentionati un email valid");
       const user = await User.findOne({ where: { email } });
 
       if (!user) {
@@ -105,6 +146,27 @@ export const controller = {
   resetPassword: async (req, res) => {
     try {
       const { id, token: tokenInput, newPassword } = req.body;
+      if (!token) {
+        return res.status(400).send("Token lipsa");
+      }
+      const arePasswordsIdentical = await bcrypt.compare(
+        password,
+        user.password
+      );
+
+      if (arePasswordsIdentical) {
+        res
+          .status(400)
+          .send("Noua parola trebuie sa fie diferita de cea veche~");
+      }
+      //validare parola noua
+      const hasUpperCase = /[A-Z]/.test(password);
+      const hasNumber = /\d/.test(password);
+      const hasSpecialCh = /[/!@#$%^&*()_\-+={}|\\:;"'<,>.?~`]/.test(password);
+      const isLongEnough = password.length > 8;
+      if (!hasUpperCase || !hasNumber || !hasSpecialCh || !isLongEnough) {
+        res.status(400).send("Parola invalida");
+      }
       const resetToken = await ResetTokens.findOne({
         where: { userId: id, used: false },
       });
@@ -117,8 +179,11 @@ export const controller = {
         return res.status(400).send("Token expirat");
       }
 
-      const valid = await bcrypt.compare(tokenInput, resetToken.token_hash);
-      if (!valid) return res.status(400).send("Token invalid!");
+      const validToken = await bcrypt.compare(
+        tokenInput,
+        resetToken.token_hash
+      );
+      if (!validToken) return res.status(400).send("Token invalid!");
 
       const user = await User.findByPk(id);
       user.password = await bcrypt.hash(newPassword, 10);

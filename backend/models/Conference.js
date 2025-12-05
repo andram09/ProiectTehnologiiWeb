@@ -1,20 +1,33 @@
 import { DataTypes } from "sequelize";
-import {db} from "../config/db.js"
+import { db } from "../config/db.js";
 
-export const Conference=db.define("Conference",
-    {
-        id:{
-            type: DataTypes.INTEGER,
-            autoIncrement:true,
-            primaryKey:true
-        },
-        title: {
-            type: DataTypes.STRING,
-            allowNull:false
-        },
-        description:{
-            type:DataTypes.TEXT
-        },
+export const Conference = db.define(
+  "Conference",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      autoIncrement: true,
+      primaryKey: true,
     },
-    {tableName: "conference"}
+    title: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    date: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
+    },
+    time: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    location: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    description: {
+      type: DataTypes.TEXT,
+    },
+  },
+  { tableName: "conference" }
 );
