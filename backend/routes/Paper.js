@@ -16,6 +16,6 @@ router.get(
   controllers.paperController.getPapersByConferenceId
 );
 
-router.put("/Update/:id", controllers.paperController.updatePaper);
+router.put("/updatePaper/:id", controllers.paperController.updatePaper);
 
-router.delete("/Delete/:id", controllers.paperController.deletePaperById);
+router.delete("/deletePaper/:id", controllers.paperController.deletePaperById);

@@ -19,23 +19,23 @@ export const controller = {
       }
       if (!/^[a-zA-Z\s]{3,}$/.test(name)) {
         //minim 3 caractere si doar litere mici si mari
-        res
+        return res
           .status(400)
           .send("Numele trb sa aiba minim 3 caractere si sa aiba doar litere");
       }
       if (!/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) {
-        res.status(400).send("Email invalid");
+        return res.status(400).send("Email invalid");
       } //traducere: mail-ul poate avea litere mici+mari +cifre + punct _-, dupa @ dupa litere mici mari+cifre si . -, dupa . si minim 2 litere pt domeniu: .com .ro
       const hasUpperCase = /[A-Z]/.test(password);
       const hasNumber = /\d/.test(password);
       const hasSpecialCh = /[/!@#$%^&*()_\-+={}|\\:;"'<,>.?~`]/.test(password);
       const isLongEnough = password.length > 8;
       if (!hasUpperCase || !hasNumber || !hasSpecialCh || !isLongEnough) {
-        res.status(400).send("Parola invalida");
+        return res.status(400).send("Parola invalida");
       } //de afisat n front ce e gresit si ce trebuie sa modifice userul in formular
       const roles = ["ORGANIZER", "AUTHOR", "REVIEWER"];
       if (!roles.includes(role)) {
-        res.status(400).send("Rol invalid");
+        return res.status(400).send("Rol invalid");
       }
 
       const hashedPassword = await bcrypt.hash(password, 10);

@@ -11,12 +11,22 @@ export const controller = {
       if (!title || !conferenceId || !fileUrl) {
         return res.status(400).send("Nu am toate campurile necesare");
       }
-
+      const conference = await Conference.findByPk(conferenceId);
+      if (!conference) {
+        return res.status(404).send("Conferinta cu id-ul dat nu exista");
+      }
+      const allowedStatus = ["UNDER_REVIEW", "ACCEPTED", "REJECTED"];
+      if (status && !allowedStatus.includes(status)) {
+        //daca e trimis statutusul trb sa verificam ca e valid, daca nu e trimis o sa devina by default under_review
+        return res.status(400).send("Status invalid!");
+      }
+      if (title.length < 3)
+        return res.status(400).send("Titlul trb sa aiba macar 3 caractere");
       const newPaper = await Paper.create({
         title,
         conferenceId,
         fileUrl,
-        status: status || "under_review",
+        status: status, //nu mnai punem || pt ca deja avem default value in model
       });
 
       res.status(201).json(newPaper);
@@ -45,18 +55,18 @@ export const controller = {
       res.status(500).send(`Eroare la preluarea tuturor lucrarilor ${err}`);
     }
   },
-  
+
   getAllPapersByAuthor: async (req, res) => {
     try {
       const authorId = req.params.id;
-      
+
       const papers = await Paper.findAll({
         include: [
           {
             model: User,
             as: "authors",
             where: { id: authorId },
-             attributes: ["id", "name", "email"],
+            attributes: ["id", "name", "email"],
             through: { attributes: ["isMainAuthor"] },
           },
         ],
@@ -105,7 +115,15 @@ export const controller = {
       if (!paper) {
         return res.status(404).send("Nu am gasit lucrarea");
       }
-
+      if (title !== undefined && title.length < 3) {
+        return res.status(400).send("Titlul trebuie sa aiba minim 3 caractere");
+      }
+      const allowedStatus = ["UNDER_REVIEW", "ACCEPTED", "REJECTED"];
+      if (status !== undefined && !allowedStatus.includes(status)) {
+        //daca e trimis statutusul trb sa verificam ca e valid, daca nu e trimis o sa devina by default under_review
+        return res.status(400).send("Status invalid!");
+      }
+      //conferenceId ar putea fi modificat de organiser? de verificat!
       if (userRole === "author") {
         await paper.update({
           title: title ?? paper.title,

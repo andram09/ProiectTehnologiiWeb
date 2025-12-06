@@ -35,12 +35,38 @@ export const controller = {
     try {
       const userId = req.params.id;
       const { name, email, role } = req.body;
-      const user = await User.findByPk(userId);
+
+      const user = await User.findByPk(userId, {
+        attributes: { exclude: ["password"] },
+      });
       if (user === null) {
         return res.status(404).send("Nu am gasit userul specificat");
       }
+      if (name !== undefined && !/^[a-zA-Z\s]{3,}$/.test(name)) {
+        //minim 3 caractere si doar litere mici si mari
+        return res
+          .status(400)
+          .send("Numele trb sa aiba minim 3 caractere si sa aiba doar litere");
+      }
+      if (
+        email !== undefined &&
+        !/[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)
+      ) {
+        return res.status(400).send("Email invalid");
+      }
+      const alreadyHasThisEmail = await User.findOne({
+        where: { email },
+        attributes: ["id"],
+      });
+      if (alreadyHasThisEmail && alreadyHasThisEmail.id != userId) {
+        return res.status(400).send("Email ul este deja folosit");
+      }
+      const roles = ["ORGANIZER", "AUTHOR", "REVIEWER"];
+      if (role !== undefined && !roles.includes(role)) {
+        res.status(400).send("Rol invalid");
+      }
       await user.update({ name, email, role });
-      res.status(200).json(user);
+      return res.status(200).json(user);
     } catch (err) {
       res.status(500).send(`Eroare la updatarea userului:${err}`);
     }
