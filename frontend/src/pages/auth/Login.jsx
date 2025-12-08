@@ -14,9 +14,9 @@ export default function Login() {
       const data = await loginRequest(email, password);
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-      if (data.user.role === "organizer") {
+      if (data.user.role.toLowerCase() === "organizer") {
         navigate("/organizer");
-      } else if (data.user.role === "reviewer") {
+      } else if (data.user.role.toLowerCase() === "reviewer") {
         navigate("/reviewer");
       } else {
         navigate("/author");

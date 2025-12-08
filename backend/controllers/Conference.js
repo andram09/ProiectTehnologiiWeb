@@ -49,13 +49,31 @@ export const controller = {
 
   getAllConferences: async (req, res) => {
     try {
-      const conferences = await Conference.findAll();
+      const conferences = await Conference.findAll({
+        include: [
+          {
+            model: User,
+            as: "participants",
+            attributes: ["id", "name", "email", "role"],
+            through: { attributes: [] },
+          },
+        ],
+      });
+
       if (conferences.length === 0) {
         return res.status(404).json("Failed to fetch conferences!");
       }
-      return res.status(200).json(conferences);
+      const result = conferences.map((conf) => ({
+        id: conf.id,
+        title: conf.title,
+        description: conf.description,
+        reviewersCount: conf.participants.filter((u) => u.role === "REVIEWER")
+          .length,
+        participants: conf.participants,
+      }));
+      return res.status(200).json(result);
     } catch (error) {
-      console.log("Couldn't fetch conferences!");
+      console.log("Couldn't fetch conferences!" + error);
       return res.status(500).send(`Couldn't fetch conferences:${error}`);
     }
   },

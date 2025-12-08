@@ -62,9 +62,13 @@ export const controller = {
       const valid = await bcrypt.compare(password, user.password);
       if (!valid) return res.status(404).send("Parola gresita");
 
-      const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-        expiresIn: "2h",
-      });
+      const token = jwt.sign(
+        { id: user.id, email: user.email, role: user.role },
+        JWT_SECRET,
+        {
+          expiresIn: "2h",
+        }
+      );
       res.status(200).send({ user, token });
     } catch (err) {
       res.status(500).send(`Server error: ${err}`);

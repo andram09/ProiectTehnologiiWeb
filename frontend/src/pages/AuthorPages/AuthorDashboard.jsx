@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import Header from "../components/Header";
+import Header from "../components/Header.jsx";
 import "./AuthorDashboard.css";
+import axios from "axios";
+import { api } from "../../api/axiosConfig.js";
 import TablePaginationActions from "../components/TablePaginationActions.jsx";
 import {
   Table,
@@ -20,30 +22,24 @@ export default function AuthorDashboard() {
   const [papers, setPapers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const user = JSON.parse(localStorage.getItem("user"));
   useEffect(() => {
-    setPapers([
-      {
-        id: 1,
-        title: "Deep Learning for Cats",
-        conference: "International AI Conference",
-        status: "UNDER_REVIEW",
-        feedback: null,
-        fileUrl: "/uploads/cats.pdf",
-        updatedAt: "2025-11-28",
-      },
-      {
-        id: 2,
-        title: "Econometrics for Beginners",
-        conference: "Data Science Summit",
-        status: "ACCEPTED",
-        feedback: "Excellent work!",
-        fileUrl: "/uploads/econometrics.pdf",
-        updatedAt: "2025-11-20",
-      },
-    ]);
+    async function fetchPapers() {
+      try {
+        const response = await api.get(`/PapersByAuthor/${user.id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        setPapers(response.data);
+      } catch (error) {
+        console.log(`Error while getting papers: ${error}`);
+      }
+    }
+    fetchPapers();
   }, []);
 
-  const user = JSON.parse(localStorage.getItem("user"));
   const userName = user.name;
   const handleChangePage = (event, newPage) => {
     setPage(newPage);

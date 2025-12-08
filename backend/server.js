@@ -1,12 +1,20 @@
 import express from "express";
 import sequelize from "sequelize";
 import cors from "cors";
+import dotenv from "dotenv";
+dotenv.config();
 import { router } from "./routes/index.js";
 const app = express();
 
-app.use(express.json());
 const port = 8080;
-
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true,
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use(express.json());
 app.use("/api", router);
 
 app.listen(port, () => {

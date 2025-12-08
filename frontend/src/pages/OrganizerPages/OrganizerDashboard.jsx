@@ -1,30 +1,46 @@
-import { 
-  Button, Dialog, DialogTitle, DialogContent,
-  DialogContentText, TextField, DialogActions,
-  Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper,
+import {
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  TextField,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
   TableFooter,
-  TablePagination
+  TablePagination,
 } from "@mui/material";
 import TablePaginationActions from "../components/TablePaginationActions.jsx";
 import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
 import "./OrganizerDashboard.css";
-
+import { getAllConferences, addConference } from "../../api/conference.js";
 export default function OrganizerDashboard() {
   const [conferences, setConferences] = useState([]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    setConferences([
-      { id: 1, title: "International AI Conference", description: "AI & ML", reviewers: [] },
-      { id: 2, title: "Data Science Summit", description: "Data Engineering", reviewers: ["R1"] },
-      { id: 3, title: "Machine Learning Expo", description: "ML Research", reviewers: ["R1", "R2"] }
-    ]);
+    async function loadConferences() {
+      try {
+        const data = await getAllConferences();
+        console.log(data);
+        setConferences(data);
+      } catch (err) {
+        console.log("Error while loading conferences: " + err);
+      }
+    }
+
+    loadConferences();
   }, []);
 
-  const [page,setPage]=useState(0);
-  const [rowsPerPage,setRowsPerPage]=useState(5);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(5);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userName = user?.name;
@@ -32,36 +48,36 @@ export default function OrganizerDashboard() {
   const handleClickOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const form = new FormData(e.target);
     const title = form.get("title");
     const description = form.get("description");
+    const date = form.get("date");
+    const time = form.get("time");
 
-    setConferences(prev => [
-      ...prev,
-      {
-        id: prev.length + 1,
-        title,
-        description,
-        reviewers: []
-      }
-    ]);
-
-    handleClose();
+    try {
+      const created = await addConference(title, description, date, time);
+      setConferences((prev) => [...prev, created]);
+      handleClose();
+    } catch (err) {
+      console.log("Error while creating conference: " + err);
+      alert("Could not create conference");
+    }
   };
 
-  const handleChangePage=(event,newPage)=>{
+  const handleChangePage = (event, newPage) => {
     setPage(newPage);
-  }
+  };
 
-  const handleChangeRowsPerPage=(event)=>{
-    setRowsPerPage(parseInt(event.target.value,10));
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
-  }
+  };
 
-  const emptyRpws=page>0?Math.max(0,(1+page)*rowsPerPage-conferences.length):0;
+  const emptyRpws =
+    page > 0 ? Math.max(0, (1 + page) * rowsPerPage - conferences.length) : 0;
 
   return (
     <div className="conferenceWrapper">
@@ -119,7 +135,7 @@ export default function OrganizerDashboard() {
                 ).map((conf) => (
                   <TableRow key={conf.id}>
                     <TableCell>{conf.title}</TableCell>
-                    <TableCell>{conf.reviewers.length}</TableCell>
+                    <TableCell>{conf.reviewersCount}</TableCell>
 
                     <TableCell>
                       <Button
