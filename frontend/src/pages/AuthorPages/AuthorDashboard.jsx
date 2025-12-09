@@ -23,6 +23,7 @@ export default function AuthorDashboard() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const user = JSON.parse(localStorage.getItem("user"));
+
   useEffect(() => {
     async function fetchPapers() {
       try {
@@ -113,7 +114,7 @@ export default function AuthorDashboard() {
                       {paper.feedback ? (
                         <Link
                           className="tableLink"
-                          to={`author/feedback/${paper.id}`}
+                          to={`/author/feedback/${paper.id}`}
                         >
                           View
                         </Link>
@@ -133,7 +134,9 @@ export default function AuthorDashboard() {
                       </a>
                     </TableCell>
 
-                    <TableCell>{paper.updatedAt}</TableCell>
+                    <TableCell>
+                      {new Date(paper.updatedAt).toLocaleString()}
+                    </TableCell>
 
                     <TableCell>
                       <Button
@@ -159,7 +162,7 @@ export default function AuthorDashboard() {
               <TableRow>
                 <TablePagination
                   rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={5}
+                  colSpan={7}
                   count={papers.length}
                   rowsPerPage={rowsPerPage}
                   page={page}

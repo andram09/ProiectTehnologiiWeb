@@ -2,13 +2,24 @@ import { Paper } from "../models/index.js";
 import { Conference } from "../models/Conference.js";
 import { Author } from "../models/Author.js";
 import { User } from "../models/User.js";
+import { uploadFile, authorize } from "./googleDrive.js";
+const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID;
+import fs from "fs/promises";
 
 export const controller = {
   createPaper: async (req, res) => {
     try {
-      const { title, conferenceId, fileUrl, status } = req.body;
+      console.log("BODY ===>", req.body);
+      console.log("FILE ===>", req.file);
 
-      if (!title || !conferenceId || !fileUrl) {
+      const { title, conferenceId, status } = req.body;
+      console.log("Uploaded file:", req.file);
+
+      if (!req.file) {
+        return res.status(400).send("No file uploaded");
+      }
+
+      if (!title || !conferenceId) {
         return res.status(400).send("Nu am toate campurile necesare");
       }
       const conference = await Conference.findByPk(conferenceId);
@@ -22,14 +33,29 @@ export const controller = {
       }
       if (title.length < 3)
         return res.status(400).send("Titlul trb sa aiba macar 3 caractere");
+      const filePath = req.file.path;
+      const auth = await authorize();
+      const driveFile = await uploadFile(auth, filePath, DRIVE_FOLDER_ID);
       const newPaper = await Paper.create({
         title,
         conferenceId,
-        fileUrl,
+        fileUrl: driveFile.webViewLink,
         status: status, //nu mnai punem || pt ca deja avem default value in model
       });
 
-      res.status(201).json(newPaper);
+      const reviewers = await User.findAll({
+        where: { role: "REVIEWER" },
+        order: db.random(),
+        limit: 2,
+      });
+
+      await newPaper.addAssignedReviewers(reviewers);
+
+      await fs.unlink(filePath);
+      res.status(201).json({
+        message: "Paper uploaded succesfully!",
+        fileUrl: driveFile.webViewLink,
+      });
     } catch (err) {
       res.status(500).send(`Eroare la crearea lucrarii: ${err}`);
     }
@@ -158,6 +184,32 @@ export const controller = {
       res.status(200).send(`Lucrarea cu id-ul ${paperId} a fost stearsa!!`);
     } catch (err) {
       res.status(500).send(`Eroare la preluarea tuturor lucrarilor ${err}`);
+    }
+  },
+
+  getPapersAssignedToReviewer: async (req, res) => {
+    try {
+      const reviewerId = req.user.id;
+
+      const reviewer = await User.findByPk(reviewerId, {
+        include: {
+          model: Paper,
+          as: "assignedPapers",
+          include: [
+            {
+              model: User,
+              as: "authors",
+              attributes: ["id", "name"],
+            },
+          ],
+        },
+      });
+
+      if (!reviewer) return res.status(404).send("Reviewerul nu exista");
+
+      res.status(200).json(reviewer.assignedPapers);
+    } catch (err) {
+      res.status(500).send(`Eroare la fetch assigned papers: ${err}`);
     }
   },
 };

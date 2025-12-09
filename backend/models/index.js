@@ -7,6 +7,7 @@ import { ConferenceAttendance } from "./ConferenceAttendance.js";
 import { Conference } from "./Conference.js";
 import { Author } from "./Author.js";
 import { ResetTokens } from "./reset_tokens.js";
+import { PaperReviewer } from "./PaperReviewer.js";
 
 ResetTokens.belongsTo(User, {
   foreignKey: "userId",
@@ -88,6 +89,20 @@ Paper.hasMany(Review, {
 });
 Review.belongsTo(Paper, { foreignKey: "paperId", onDelete: "CASCADE" });
 
+//paper_reviewer
+User.belongsToMany(Paper, {
+  through: PaperReviewer,
+  foreignKey: "paperId",
+  as: "assignedPapers",
+  onDelete: "CASCADE",
+});
+Paper.belongsToMany(User, {
+  through: PaperReviewer,
+  foreignKey: "paperId",
+  as: "assignedReviewers",
+  onDelete: "CASCADE",
+});
+
 export {
   db,
   User,
@@ -97,4 +112,5 @@ export {
   Author,
   Review,
   ResetTokens,
+  PaperReviewer,
 };

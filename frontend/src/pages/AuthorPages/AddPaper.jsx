@@ -13,6 +13,7 @@ export default function AddPaper() {
     async function fetchConferences() {
       try {
         const response = await api.get(`/Conferences`);
+        setConferences(response.data);
       } catch (err) {
         console.log(`Error while fetching meetings: ${err}`);
       }
@@ -20,10 +21,30 @@ export default function AddPaper() {
     fetchConferences();
   }, []);
 
+  const validations = () => {
+    if (!title) return "Title is required";
+    if (title.length < 3) return "Title must have at least 3 characters.";
+    if (!/^[a-zA-Z0-9\s\-\.,!?()]+$/.test(title))
+      return "Title contains invalid characters.";
+
+    if (!conferenceId) return "Please select a conference.";
+
+    //DE VAZUT DUPA IMPLEMENTERAE ADAUGARE FISIER
+    // if (!file) return "Please upload your paper (PDF).";
+
+    // if (file.type !== "application/pdf") return "File must be a PDF document.";
+
+    // if (file.size > 10 * 1024 * 1024)
+    //   return "PDF is too large. Max size: 10 MB.";
+
+    return null; // totul e ok
+  };
+
   const handleSubmit = async () => {
     try {
-      if (!title || !conferenceId || !file) {
-        alert("All fields are required!!");
+      const error = validations();
+      if (error) {
+        alert(error);
         return;
       }
 
@@ -38,11 +59,13 @@ export default function AddPaper() {
         file,
       });
 
-      await api.post(`./createPaper`, {
-        title: title,
-        conferenceId: conferenceId,
-        file: file,
+      //de modificat dupa ce face rucsi incarcarea fisierelor
+      await api.post(`/createPaper`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
+
       window.location.href = "./";
     } catch (error) {
       alert("Error while uploading the file!");
@@ -72,7 +95,7 @@ export default function AddPaper() {
         >
           {conferences.map((conf) => (
             <MenuItem key={conf.id} value={conf.id}>
-              {conf.name}
+              {conf.title}
             </MenuItem>
           ))}
         </TextField>

@@ -1,15 +1,17 @@
 import { Routes, Route } from "react-router-dom";
 
-import Home from "../pages/Home/Home.jsx";
-import Login from "../pages/auth/Login.jsx";
-import Register from "../pages/auth/Register.jsx";
-import AuthorAddPaper from "../pages/AuthorPages/AddPaper.jsx";
+import Home from "../Pages/Home/Home.jsx";
+import Login from "../Pages/auth/Login.jsx";
+import Register from "../Pages/auth/Register.jsx";
+import AuthorAddPaper from "../Pages/AuthorPages/AuthorDashboard.jsx";
 import ProtectedRoute from "./ProtectedRoute.jsx";
 import RoleRoute from "./RoleRoute.jsx";
-import AuthorDashboard from "../pages/AuthorPages/AuthorDashboard.jsx";
-import OrganizerDashBoard from "../pages/OrganizerPages/OrganizerDashboard.jsx";
-import ReviewerDashboard from "../pages/ReviewerPages/ReviewerDashboard.jsx";
-import AddReview from "../pages/ReviewerPages/AddReview.jsx";
+import AuthorDashboard from "../Pages/AuthorPages/AuthorDashboard.jsx";
+import OrganizerDashboard from "../Pages/OrganizerPages/OrganizerDashboard.jsx";
+import ReviewerDashboard from "../Pages/ReviewerPages/ReviewerDashboard.jsx";
+import AddReview from "../Pages/ReviewerPages/AddReview.jsx";
+import ForgotPassword from "../Pages/auth/ForgotPassword.jsx";
+import ResetPassword from "../Pages/auth/ResetPassword.jsx";
 
 export default function AppRouter() {
   return (
@@ -17,6 +19,9 @@ export default function AppRouter() {
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
       <Route
         path="/author/addPaper"
         element={
@@ -42,7 +47,7 @@ export default function AppRouter() {
         element={
           <ProtectedRoute>
             <RoleRoute role="organizer">
-              <OrganizerDashBoard />
+              <OrganizerDashboard />
             </RoleRoute>
           </ProtectedRoute>
         }

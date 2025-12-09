@@ -16,11 +16,11 @@ import {
   TableFooter,
   TablePagination,
 } from "@mui/material";
-import TablePaginationActions from "../components/TablePaginationActions.jsx";
 import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
 import "./OrganizerDashboard.css";
 import { getAllConferences, addConference } from "../../api/conference.js";
+import TablePaginationActions from "../components/TablePaginationActions.jsx";
 export default function OrganizerDashboard() {
   const [conferences, setConferences] = useState([]);
   const [open, setOpen] = useState(false);
@@ -180,16 +180,23 @@ export default function OrganizerDashboard() {
             </TableBody>
             <TableFooter>
               <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 25, { label: "All", value: -1 }]}
-                  colSpan={5}
-                  count={conferences.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  ActionsComponent={TablePaginationActions}
-                />
+                {
+                  <TablePagination
+                    rowsPerPageOptions={[
+                      5,
+                      10,
+                      25,
+                      { label: "All", value: -1 },
+                    ]}
+                    colSpan={5}
+                    count={conferences.length}
+                    rowsPerPage={rowsPerPage}
+                    page={page}
+                    onPageChange={handleChangePage}
+                    onRowsPerPageChange={handleChangeRowsPerPage}
+                    ActionsComponent={TablePaginationActions}
+                  />
+                }
               </TableRow>
             </TableFooter>
           </Table>

@@ -4,6 +4,7 @@ import Header from "../components/Header.jsx";
 import "./ReviewerDashboard.css";
 import { useState } from "react";
 import { useEffect } from "react";
+import { api } from "../../api/axiosConfig.js";
 import TablePaginationActions from "../components/TablePaginationActions.jsx";
 import {
   Dialog,
@@ -28,35 +29,25 @@ export default function ReviewerDashboard() {
   const name = user.name;
 
   const [papersToReview, setPapersToReview] = useState([]);
-
-  useEffect(() => {
-    setPapersToReview([
-      {
-        id: 1,
-        title: "Deep Learning for Cats",
-        author: "Andra Moise",
-        receivedAt: "2025-11-28",
-        fileUrl: "/uploads/cats.pdf",
-      },
-      {
-        id: 2,
-        title: "Econometrics 101",
-        author: "Andrei Ionescu",
-        receivedAt: "2025-11-20",
-        fileUrl: "/uploads/econometrics.pdf",
-      },
-      {
-        id: 3,
-        title: "AI Ethics Paper",
-        author: "Bianca Pavel",
-        receivedAt: "2025-11-13",
-        fileUrl: "/uploads/ai-ethics.pdf",
-      },
-    ]);
-  }, []);
-
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+
+  useEffect(() => {
+    async function loadPapers() {
+      try {
+        const response = await api.get("/papersAssignedToMe", {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+
+        setPapersToReview(response.data);
+      } catch (err) {
+        console.log("Error loading assigned papers", err);
+      }
+    }
+
+    loadPapers();
+  }, []);
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -115,7 +106,11 @@ export default function ReviewerDashboard() {
                 papersToReview.map((paper) => (
                   <TableRow key={paper.id}>
                     <TableCell>{paper.title}</TableCell>
-                    <TableCell>{paper.author}</TableCell>
+                    <TableCell>
+                      {paper.authors && paper.authors.length > 0
+                        ? paper.authors[0].name
+                        : "-"}
+                    </TableCell>
                     <TableCell>{paper.receivedAt}</TableCell>
 
                     <TableCell>
@@ -165,7 +160,6 @@ export default function ReviewerDashboard() {
             </TableFooter>
           </Table>
         </TableContainer>
-    
       </div>
     </div>
   );

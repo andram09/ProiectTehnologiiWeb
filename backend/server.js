@@ -2,6 +2,7 @@ import express from "express";
 import sequelize from "sequelize";
 import cors from "cors";
 import dotenv from "dotenv";
+
 dotenv.config();
 import { router } from "./routes/index.js";
 const app = express();
@@ -14,7 +15,10 @@ app.use(
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: "50mb" })); //verificare poate merge cu limit
+
 app.use("/api", router);
 
 app.listen(port, () => {

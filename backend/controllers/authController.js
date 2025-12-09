@@ -123,6 +123,11 @@ export const controller = {
 
       const token = crypto.randomBytes(32).toString("hex"); //token de 64 de caractere
       const token_hash = await bcrypt.hash(token, 10);
+      await ResetTokens.update(
+        { used: true },
+        { where: { userId: user.id, used: false } }
+      );
+
       await ResetTokens.create({
         userId: user.id,
         token_hash: token_hash,
@@ -141,7 +146,7 @@ export const controller = {
         <p>Linkul expira în 15 minute.</p>`,
       };
       await transporter.sendMail(mailMessage);
-      res.status(200).send("Email de resetare trimis!");
+      return res.status(200).send("Email de resetare trimis!");
     } catch (err) {
       console.log(err);
       return res.status(500).send(`Server errror:${err}`);
@@ -150,36 +155,46 @@ export const controller = {
   resetPassword: async (req, res) => {
     try {
       const { id, token: tokenInput, newPassword } = req.body;
-      if (!token) {
+      if (!tokenInput) {
+        console.log("Token lipsa");
         return res.status(400).send("Token lipsa");
       }
+      const user = await User.findByPk(id);
+      if (!user) {
+        return res.status(404).send("Not found");
+      }
       const arePasswordsIdentical = await bcrypt.compare(
-        password,
+        newPassword,
         user.password
       );
 
       if (arePasswordsIdentical) {
-        res
+        console.log("Parola noua e la fel cu cea veche");
+        return res
           .status(400)
-          .send("Noua parola trebuie sa fie diferita de cea veche~");
+          .send("Noua parola trebuie sa fie diferita de cea veche");
       }
       //validare parola noua
-      const hasUpperCase = /[A-Z]/.test(password);
-      const hasNumber = /\d/.test(password);
-      const hasSpecialCh = /[/!@#$%^&*()_\-+={}|\\:;"'<,>.?~`]/.test(password);
-      const isLongEnough = password.length > 8;
+      const hasUpperCase = /[A-Z]/.test(newPassword);
+      const hasNumber = /\d/.test(newPassword);
+      const hasSpecialCh = /[/!@#$%^&*()_\-+={}|\\:;"'<,>.?~`]/.test(
+        newPassword
+      );
+      const isLongEnough = newPassword.length > 8;
       if (!hasUpperCase || !hasNumber || !hasSpecialCh || !isLongEnough) {
-        res.status(400).send("Parola invalida");
+        return res.status(400).send("Parola invalida");
       }
       const resetToken = await ResetTokens.findOne({
         where: { userId: id, used: false },
       });
       if (!resetToken) {
+        console.log("Token invalid sau folosit deja");
         return res
           .status(400)
           .send("Tokenul este invalid sau a fost deja folosit!");
       }
       if (new Date(resetToken.expires_at) < new Date()) {
+        console.log("Token expirat");
         return res.status(400).send("Token expirat");
       }
 
@@ -187,9 +202,11 @@ export const controller = {
         tokenInput,
         resetToken.token_hash
       );
-      if (!validToken) return res.status(400).send("Token invalid!");
-
-      const user = await User.findByPk(id);
+      console.log(resetToken.token_hash);
+      if (!validToken) {
+        console.log("Token invalid" + tokenInput);
+        return res.status(400).send("Token invalid!");
+      }
       user.password = await bcrypt.hash(newPassword, 10);
       await user.save();
 

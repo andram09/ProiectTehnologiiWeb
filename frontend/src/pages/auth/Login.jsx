@@ -64,6 +64,14 @@ export default function Login() {
         <a className="link-auth" href="/register">
           Sign up here...
         </a>
+        <Button
+          className="passwordReset"
+          onClick={() => {
+            navigate("/forgot-password");
+          }}
+        >
+          Forgotten password?
+        </Button>
       </div>
     </div>
   );
