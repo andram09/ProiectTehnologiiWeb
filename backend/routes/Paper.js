@@ -11,16 +11,6 @@ router.post(
   upload.single("file"),
   controllers.paperController.createPaper
 );
-//test
-
-router.post("/test-upload", upload.single("file"), (req, res) => {
-  console.log("TEST: req.file", req.file);
-  if (req.file) {
-    res.status(200).json({ message: "Test OK", fileDetails: req.file });
-  } else {
-    res.status(400).send("No file received from client");
-  }
-});
 
 router.get(
   "/Papers",
@@ -45,6 +35,7 @@ router.put(
   "/updatePaper/:id",
   verifyToken,
   allowRoles("AUTHOR"),
+  upload.single("file"),
   controllers.paperController.updatePaper
 );
 

@@ -40,7 +40,6 @@ export default function AuthorDashboard() {
     }
     fetchPapers();
   }, []);
-
   const userName = user.name;
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -58,7 +57,10 @@ export default function AuthorDashboard() {
     <div className="authorWrapper">
       <Header
         userName={userName}
-        tabs={[{ label: "Conferences", to: "/login" }]}
+        tabs={[
+          { label: "Conferences", to: "./conferences" },
+          { label: "Profile", to: `./profile` },
+        ]}
         showLogout={true}
       />
 
@@ -107,7 +109,7 @@ export default function AuthorDashboard() {
                 papers.map((paper) => (
                   <TableRow key={paper.id}>
                     <TableCell>{paper.title}</TableCell>
-                    <TableCell>{paper.conference}</TableCell>
+                    <TableCell>{paper.Conference?.title}</TableCell>
                     <TableCell>{paper.status}</TableCell>
 
                     <TableCell>

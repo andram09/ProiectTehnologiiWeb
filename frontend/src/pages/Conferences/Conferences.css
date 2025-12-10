@@ -1,0 +1,68 @@
+.conferenceWrapper {
+  background: #f7e9ef;
+  min-height: 100vh;
+  width: 100%;
+  padding-top: 2rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.conferenceContent {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3rem;
+  padding: 2rem 0;
+}
+
+.leftPanel,
+.rightPanel {
+  width: 85%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.panelTitle {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #7a2f45;
+  margin-left: 0.3rem;
+}
+
+.tableCard {
+  background: white;
+  padding: 2rem;
+  border-radius: 15px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.MuiTableCell-root {
+  padding: 12px 14px !important;
+  text-align: center !important;
+  font-size: 15px;
+}
+
+.MuiTableHead-root .MuiTableCell-root {
+  background-color: #f3dce4 !important;
+  font-weight: 700 !important;
+}
+
+.MuiTableBody-root .MuiTableRow-root:hover {
+  background-color: #faf1f4;
+}
+
+.attendBtn {
+  background-color: #b14c6c !important;
+  color: white !important;
+  padding: 4px 12px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+}
+
+.MuiTablePagination-root {
+  border-top: 1px solid #ddd !important;
+}

@@ -67,8 +67,8 @@ export default function ReviewerDashboard() {
       <Header
         userName={name}
         tabs={[
-          { label: "Past Reviews", to: "/reviewer/past-reviews" },
-          { label: "Conferences", to: "/reviewer/conferences" },
+          { label: "Conferences", to: "./conferences" },
+          { label: "Profile", to: `./profile` },
         ]}
       />
 

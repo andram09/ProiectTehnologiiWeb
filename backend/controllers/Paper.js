@@ -2,23 +2,20 @@ import { Paper } from "../models/index.js";
 import { Conference } from "../models/Conference.js";
 import { Author } from "../models/Author.js";
 import { User } from "../models/User.js";
-import { uploadFile, authorize } from "./googleDrive.js";
-const DRIVE_FOLDER_ID = process.env.DRIVE_FOLDER_ID;
-import fs from "fs/promises";
+import { ConferenceAttendance } from "../models/index.js";
+const SERVER_URL = process.env.SERVER_URL;
+import { db } from "../models/index.js";
 
 export const controller = {
   createPaper: async (req, res) => {
     try {
-      console.log("BODY ===>", req.body);
-      console.log("FILE ===>", req.file);
-
       const { title, conferenceId, status } = req.body;
-      console.log("Uploaded file:", req.file);
+      const userId = req.user.id;
 
       if (!req.file) {
         return res.status(400).send("No file uploaded");
       }
-
+      console.log(title, conferenceId);
       if (!title || !conferenceId) {
         return res.status(400).send("Nu am toate campurile necesare");
       }
@@ -33,16 +30,31 @@ export const controller = {
       }
       if (title.length < 3)
         return res.status(400).send("Titlul trb sa aiba macar 3 caractere");
-      const filePath = req.file.path;
-      const auth = await authorize();
-      const driveFile = await uploadFile(auth, filePath, DRIVE_FOLDER_ID);
+
       const newPaper = await Paper.create({
         title,
         conferenceId,
-        fileUrl: driveFile.webViewLink,
+        fileUrl: `${SERVER_URL}/uploads/${req.file.filename}`,
         status: status, //nu mnai punem || pt ca deja avem default value in model
       });
+      await Author.create({
+        paperId: newPaper.id,
+        userId: userId,
+        isMainAuthor: true,
+      });
 
+      //logica inscriere automata a unui user la o conferinta
+      const exists = await ConferenceAttendance.findOne({
+        where: { userId: userId, conferenceId },
+      });
+      if (!exists) {
+        await ConferenceAttendance.create({
+          userId,
+          conferenceId,
+        });
+      }
+
+      //logica asignare 2 revieweri random
       const reviewers = await User.findAll({
         where: { role: "REVIEWER" },
         order: db.random(),
@@ -51,10 +63,9 @@ export const controller = {
 
       await newPaper.addAssignedReviewers(reviewers);
 
-      await fs.unlink(filePath);
       res.status(201).json({
         message: "Paper uploaded succesfully!",
-        fileUrl: driveFile.webViewLink,
+        fileUrl: `${SERVER_URL}/uploads/${req.file.filename}`,
       });
     } catch (err) {
       res.status(500).send(`Eroare la crearea lucrarii: ${err}`);
@@ -95,6 +106,7 @@ export const controller = {
             attributes: ["id", "name", "email"],
             through: { attributes: ["isMainAuthor"] },
           },
+          { model: Conference, attributes: ["title"] },
         ],
       });
 
@@ -134,8 +146,8 @@ export const controller = {
   updatePaper: async (req, res) => {
     try {
       const paperId = req.params.id;
-      const { title, conferenceId, fileUrl, status } = req.body;
-      const userRole = req.user.role;
+      const { title, conferenceId, status } = req.body;
+      const userRole = req.user.role.toUpperCase();
 
       const paper = await Paper.findByPk(paperId);
       if (!paper) {
@@ -149,13 +161,19 @@ export const controller = {
         //daca e trimis statutusul trb sa verificam ca e valid, daca nu e trimis o sa devina by default under_review
         return res.status(400).send("Status invalid!");
       }
-      //conferenceId ar putea fi modificat de organiser? de verificat!
-      if (userRole === "author") {
+      //conferenceId ar putea fi modificat de organiser? de verificat
+      let newFileUrl = paper.fileUrl;
+      if (req.file) {
+        newFileUrl = `${process.env.SERVER_URL}/uploads/${req.file.filename}`;
+      }
+
+      if (userRole === "AUTHOR") {
         await paper.update({
           title: title ?? paper.title,
-          fileUrl: fileUrl ?? paper.fileUrl,
+          conferenceId: conferenceId ?? paper.conferenceId,
+          fileUrl: newFileUrl,
         });
-      } else if (userRole === "reviewer") {
+      } else if (userRole === "REVIEWER") {
         await paper.update({
           status: status ?? paper.status,
         });
@@ -171,6 +189,7 @@ export const controller = {
 
   deletePaperById: async (req, res) => {
     try {
+      //sterge si din folder
       const paperId = req.params.id;
 
       const deleted = await Paper.destroy({

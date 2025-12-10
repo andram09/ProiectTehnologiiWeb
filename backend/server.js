@@ -17,7 +17,8 @@ app.use(
 );
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true, limit: "50mb" })); //verificare poate merge cu limit
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static("uploads"));
 
 app.use("/api", router);
 

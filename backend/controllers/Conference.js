@@ -66,6 +66,9 @@ export const controller = {
       const result = conferences.map((conf) => ({
         id: conf.id,
         title: conf.title,
+        date: conf.date,
+        time: conf.time,
+        location: conf.location,
         description: conf.description,
         reviewersCount: conf.participants.filter((u) => u.role === "REVIEWER")
           .length,

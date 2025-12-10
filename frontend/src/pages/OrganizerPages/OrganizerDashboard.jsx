@@ -78,12 +78,15 @@ export default function OrganizerDashboard() {
 
   const emptyRpws =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - conferences.length) : 0;
-
+  const role = user.role.toLowerCase();
   return (
     <div className="conferenceWrapper">
       <Header
         userName={userName}
-        tabs={[{ label: "Conferences", to: "/organizer" }]}
+        tabs={[
+          { label: "Conferences", to: "./conferences" },
+          { label: "Profile", to: `./profile` },
+        ]}
         showLogout
       />
 

@@ -30,12 +30,12 @@ export default function AddPaper() {
     if (!conferenceId) return "Please select a conference.";
 
     //DE VAZUT DUPA IMPLEMENTERAE ADAUGARE FISIER
-    // if (!file) return "Please upload your paper (PDF).";
+    if (!file) return "Please upload your paper (PDF).";
 
-    // if (file.type !== "application/pdf") return "File must be a PDF document.";
+    if (file.type !== "application/pdf") return "File must be a PDF document.";
 
-    // if (file.size > 10 * 1024 * 1024)
-    //   return "PDF is too large. Max size: 10 MB.";
+    if (file.size > 50 * 1024 * 1024)
+      return "PDF is too large. Max size: 50 MB.";
 
     return null; // totul e ok
   };
@@ -53,16 +53,10 @@ export default function AddPaper() {
       formData.append("conferenceId", conferenceId);
       formData.append("file", file);
 
-      console.log("DATA TRIMISA:", {
-        title,
-        conferenceId,
-        file,
-      });
-
-      //de modificat dupa ce face rucsi incarcarea fisierelor
       await api.post(`/createPaper`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
 
@@ -101,12 +95,15 @@ export default function AddPaper() {
         </TextField>
 
         <label className="label">Paper file</label>
-        <input
-          type="file"
-          accept="application/pdf"
-          className="fileInput"
-          onChange={(e) => setFile(e.target.files[0])}
-        />
+        <div id="fileInputDiv">
+          <input
+            type="file"
+            accept="application/pdf"
+            className="fileInput"
+            onChange={(e) => setFile(e.target.files[0])}
+          />
+          {file && <div className="filePreview"> {file.name}</div>}
+        </div>
 
         <Button
           variant="contained"

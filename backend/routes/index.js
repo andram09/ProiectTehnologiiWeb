@@ -7,6 +7,8 @@ import { router as conferenceRouter } from "./Conference.js";
 import { router as reviewRouter } from "./Review.js";
 import { router as userRouter } from "./User.js";
 import { router as authRouter } from "./Auth.js";
+import { router as conferenceAttendanceRouter } from "./ConferenceAttendance.js";
+
 export const router = express.Router();
 router.use("/", otherRouter);
 router.use("/", authorRouter);
@@ -15,3 +17,4 @@ router.use("/", conferenceRouter);
 router.use("/", reviewRouter);
 router.use("/", userRouter);
 router.use("/", authRouter);
+router.use("/", conferenceAttendanceRouter);

@@ -13,12 +13,12 @@
   border-radius: 20px;
   width: 100%;
   max-width: 450px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
 .addPaperTitle {
   margin-bottom: 1.5rem;
-  color: #C76C8F;
+  color: #c76c8f;
 }
 
 .label {
@@ -34,12 +34,29 @@
 }
 
 .btnSubmit {
-  background-color: #D884A7 !important;
+  background-color: #d884a7 !important;
   color: white !important;
   width: 100%;
   margin-top: 1rem;
 }
+.fileInputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 8px 0 20px 0;
+}
 
+.filePreview {
+  padding: 10px 14px;
+  background: #f6d7e4;
+  color: #a1446f;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: fit-content;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+  margin-bottom: 20px;
+}
 
 /* ======== MOBILE VERSION ======== */
 
