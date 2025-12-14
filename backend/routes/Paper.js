@@ -13,21 +13,21 @@ router.post(
 );
 
 router.get(
-  "/Papers",
+  "/papers",
   verifyToken,
   allowRoles("ORGANIZER", "REVIEWER"),
   controllers.paperController.getAllPapers
 );
 
 router.get(
-  "/PapersByAuthor/:id",
+  "/papersByAuthor/:id",
   verifyToken,
   allowRoles("AUTHOR", "ORGANIZER"),
   controllers.paperController.getAllPapersByAuthor
 );
 
 router.get(
-  "/PapersByConference/:id",
+  "/papersByConference/:id",
   controllers.paperController.getPapersByConferenceId
 );
 
@@ -47,8 +47,15 @@ router.delete(
 );
 
 router.get(
-  "/papersAssignedToMe/:id",
+  "/papersAssignedToMe",
   verifyToken,
   allowRoles("REVIEWER"),
   controllers.paperController.getPapersAssignedToReviewer
+);
+
+router.get(
+  "/paper/:id",
+  verifyToken,
+  allowRoles("REVIEWER", "AUTHOR", "ORGANIZER"), 
+  controllers.paperController.getPaperById
 );

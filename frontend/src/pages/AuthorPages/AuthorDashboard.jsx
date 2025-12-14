@@ -6,6 +6,7 @@ import "./AuthorDashboard.css";
 import axios from "axios";
 import { api } from "../../api/axiosConfig.js";
 import TablePaginationActions from "../components/TablePaginationActions.jsx";
+
 import {
   Table,
   TableBody,
@@ -17,6 +18,7 @@ import {
   TableFooter,
   TablePagination,
 } from "@mui/material";
+
 
 export default function AuthorDashboard() {
   const [papers, setPapers] = useState([]);
@@ -65,11 +67,8 @@ export default function AuthorDashboard() {
       />
 
       <div className="contentArea">
-        <Link to="/author/addPaper">
-          <Button variant="contained" className="addNewBtn">
-            Add New Paper
-          </Button>
-        </Link>
+
+
         <TableContainer component={Paper} className="tabelCard">
           <Table>
             <TableHead>
@@ -176,6 +175,16 @@ export default function AuthorDashboard() {
             </TableFooter>
           </Table>
         </TableContainer>
+        <div className="btnContainer">
+          <Button
+            variant="contained"
+            className="addNewBtn"
+            component={Link}
+            to="/author/addPaper"
+          >
+            Add Paper
+          </Button>
+        </div>
       </div>
     </div>
   );

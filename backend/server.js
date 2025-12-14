@@ -2,7 +2,7 @@ import express from "express";
 import sequelize from "sequelize";
 import cors from "cors";
 import dotenv from "dotenv";
-
+import {db} from './models/index.js'
 dotenv.config();
 import { router } from "./routes/index.js";
 const app = express();
@@ -22,6 +22,7 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/api", router);
 
+await db.sync();
 app.listen(port, () => {
   console.log(`Aplicatia ruleaza pe portul http://localhost:${port}`);
 });

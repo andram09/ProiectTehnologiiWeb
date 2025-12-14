@@ -84,9 +84,6 @@ export default function ReviewerDashboard() {
                   <strong>Author</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Received Date</strong>
-                </TableCell>
-                <TableCell>
                   <strong>File</strong>
                 </TableCell>
                 <TableCell>
@@ -98,7 +95,7 @@ export default function ReviewerDashboard() {
             <TableBody>
               {papersToReview.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} style={{ textAlign: "center" }}>
+                  <TableCell colSpan={4} style={{ textAlign: "center" }}>
                     No papers assigned yet.
                   </TableCell>
                 </TableRow>
@@ -111,8 +108,6 @@ export default function ReviewerDashboard() {
                         ? paper.authors[0].name
                         : "-"}
                     </TableCell>
-                    <TableCell>{paper.receivedAt}</TableCell>
-
                     <TableCell>
                       <a
                         className="tableLink"

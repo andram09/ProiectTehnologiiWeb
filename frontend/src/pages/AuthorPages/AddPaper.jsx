@@ -12,7 +12,7 @@ export default function AddPaper() {
   useEffect(() => {
     async function fetchConferences() {
       try {
-        const response = await api.get(`/Conferences`);
+        const response = await api.get(`/conferences`);
         setConferences(response.data);
       } catch (err) {
         console.log(`Error while fetching meetings: ${err}`);

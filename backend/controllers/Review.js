@@ -58,41 +58,22 @@ export const controller = {
     }
   },
   updateReview: async (req, res) => {
-    try {
-      const reviewId = req.params.id;
-      const updateData = req.body;
-      const review = await Review.findByPk(reviewId);
-      if (!review) return res.status(404).send("Review-ul nu exista!");
-      if (
-        updateData.feedback !== undefined &&
-        updateData.feedback.length < 10
-      ) {
-        return res
-          .status(400)
-          .send("Feedback-ul trebuie sa aiba minim 10 caractere");
-      }
-      const allowedDecisions = ["APPROVED", "REVISE", "REJECT"];
-      if (
-        updateData.decision !== undefined &&
-        !allowedDecisions.includes(updateData.decision)
-      ) {
-        return res.status(400).send("Decizie invalida");
-      }
-      if (
-        updateData.isActive !== undefined &&
-        typeof updateData.isActive !== "boolean"
-      ) {
-        return res.status(400).send("isActive trebuie sa fie true sau false");
-      }
-      review.set({
-        feedback: updateData.feedback ?? review.feedback,
-        decision: updateData.decision ?? review.decision,
-        isActive: updateData.isActive ?? review.isActive,
-      });
-      await review.save();
-      return res.status(200).send(review);
-    } catch (err) {
-      return res.status(500).send(`Eroare la update review: ${err}`);
+    try{
+      const reviewId=req.params.id;
+    const {isActive}=req.body;
+    if(typeof isActive!==boolean){
+      return res.status(400).send("isActive must be true or false");
+    }
+    const review=await Review.findByPk(reviewId);
+    if(!review){
+      return res.status(404).send("Review doesnt exist");
+    }
+
+    await review.update({isActive});
+    return res.status(200).send(review);
+    }catch(err){
+      console.log(err);
+      return res.status(500).send("Err while updating");
     }
   },
 };

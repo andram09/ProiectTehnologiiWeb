@@ -2,36 +2,41 @@
   background: #f7e9ef;
   min-height: 100vh;
   min-width: 100vw;
+  
 }
 
 .contentArea {
   margin-top: 3rem;
   display: flex;
-  justify-content: center;
-  width: 100%;
-  flex-direction: column;
-  gap: 2rem;
+  flex-direction: row;
+  align-items: flex-start; 
+  gap: 1.5rem;
   padding: 1rem;
 }
+.btnContainer{
+  display: flex;
+  align-items: flex-start; 
+  width: 30%;
+}
+
+.addNewBtn {
+  background: #923e57 !important;
+  color: white !important;
+  height: 50px;
+  border-radius: 8px !important;
+  padding: 0 20px !important;
+  margin: 0; 
+}
+
 .tableCard {
   background: white;
   padding: 2rem;
   border-radius: 15px;
-  width: 80%;
+  width: 70%;
   max-width: 1000px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-}
-.paperTable {
-  width: 100%;
-  border-collapse: collapse;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.paperTable th,
-.paperTable td {
-  padding: 12px 14px;
-  border-bottom: 1px solid #ddd;
-  text-align: center;
-}
 .tableLink {
   color: #b14c6c;
   font-weight: 600;
@@ -44,38 +49,20 @@
   border-radius: 6px !important;
 }
 
-.addNewBtn {
-  margin: 1rem auto !important;
-  display: block;
-  background: #923e57 !important;
-  color: white !important;
-  height: 50px;
-  border-radius: 8px !important;
-  padding: 0 20px !important;
-}
-
-
-/* ---------- DESKTOP MODE ---------- */
-@media (min-width: 1250px) {
-  .authorWrapper {
-    background: #f7e9ef;
-    min-height: 100vh;
-    min-width: 100vw;
+@media (max-width: 900px) {
+  .contentArea {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
   }
 
-  .contentArea {
-    margin-top: 30px;
-    display: flex;
-    justify-content: center;
+  .tableCard,
+  .btnContainer {
     width: 100%;
   }
 
-  .tableCard {
-    background: white;
-    padding: 2rem;
-    border-radius: 15px;
-    width: 80%;
-    max-width: 1000px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  .btnContainer {
+    justify-content: center;
   }
 }
+

@@ -17,7 +17,7 @@ export default function EditPaper() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const confRes = await api.get("/Conferences");
+        const confRes = await api.get("/conferences");
         setConferences(confRes.data);
 
         const paperRes = await api.get(
@@ -55,6 +55,7 @@ export default function EditPaper() {
           "Content-Type": "multipart/form-data",
         },
       });
+  
 
       navigate("/author");
     } catch (err) {

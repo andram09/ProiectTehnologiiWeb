@@ -60,9 +60,7 @@ export const controller = {
         ],
       });
 
-      if (conferences.length === 0) {
-        return res.status(404).json("Failed to fetch conferences!");
-      }
+
       const result = conferences.map((conf) => ({
         id: conf.id,
         title: conf.title,

@@ -4,9 +4,9 @@ import { controllers } from "../controllers/index.js";
 import { verifyToken } from "../middleware/auth/verifyToken.js";
 import { allowRoles } from "../middleware/auth/roleMiddleware.js";
 
-router.get("/Conferences", controllers.conferenceController.getAllConferences);
+router.get("/conferences", controllers.conferenceController.getAllConferences);
 router.get(
-  "/Conferences/:id",
+  "/conferences/:id",
   controllers.conferenceController.getConferenceById
 );
 router.get(

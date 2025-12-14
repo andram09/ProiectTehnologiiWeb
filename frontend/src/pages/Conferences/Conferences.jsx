@@ -19,6 +19,7 @@ import "./Conferences.css";
 export default function Conferences() {
   const user = JSON.parse(localStorage.getItem("user"));
   const userId = user.id;
+  const role = user.role.toLowerCase();
 
   const [myConferences, setMyConferences] = useState([]);
   const [allConferences, setAllConferences] = useState([]);
@@ -47,7 +48,7 @@ export default function Conferences() {
 
   async function loadAllConferences() {
     try {
-      const res = await api.get(`/Conferences`);
+      const res = await api.get(`/conferences`);
       setAllConferences(res.data);
     } catch (err) {
       console.error("Error loading all conferences:", err);
@@ -74,7 +75,7 @@ export default function Conferences() {
       <Header
         userName={user.name}
         tabs={[
-          { label: "Conferences", to: "./conferences" },
+          { label: "Dashboard", to: `../${role}` },
           { label: "Profile", to: `./profile` },
         ]}
         showBack={true}

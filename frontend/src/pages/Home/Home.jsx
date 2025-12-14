@@ -14,8 +14,7 @@ export default function Home() {
           </Typography>
 
           <Typography variant="body1" className="homeText">
-            Platforma pentru organizare conferinte, incarcare lucrari de catre
-            autori si review-uri pentru acestea.
+            A platform designed for managing conferences, enabling authors to submit papers and reviewers to evaluate them.
           </Typography>
 
           <div className="homeButtons">

@@ -38,7 +38,8 @@ export default function AddReview() {
 
     if (!decision) return "Please select a decision before submitting.";
 
-    if (decision === "REJECTED") {
+  
+    if (decision === "REJECT") {
       if (!feedback.trim())
         return "Feedback is required when the paper is rejected.";
 
@@ -46,7 +47,7 @@ export default function AddReview() {
         return "Feedback must contain at least 10 characters.";
     }
 
-    return null; // totul e ok
+    return null; 
   };
 
   const handleSubmit = async () => {
@@ -57,6 +58,8 @@ export default function AddReview() {
     }
 
     try {
+      const token = localStorage.getItem("token");
+      const config = { headers: { Authorization: `Bearer ${token}` } };
       await api.post(
         "/createReview",
         {
@@ -65,21 +68,39 @@ export default function AddReview() {
           paperId: paper.id,
           userId: user.id,
         },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
+        config
       );
 
-      alert("Review submitted successfully!");
+      let reviews = [];
+      try {
+        const reviewsResponse = await api.get(`/reviewByPaperId/${paper.id}`, config);
+        reviews = reviewsResponse.data;
+      } catch (e) {
+        console.log("Nu am putut prelua review-urile sau e primul review.");
+      }
+
+      if (reviews.length === 2) {
+        const allApproved = reviews.every((r) => r.decision === "APPROVED");
+        
+        const newPaperStatus = allApproved ? "ACCEPTED" : "REJECTED";
+
+        await api.put(
+          `/updatePaper/${paper.id}`,
+          { status: newPaperStatus },
+          config
+        );
+        
+        alert(`Review submitted! Paper status updated to: ${newPaperStatus}`);
+      } else {
+        alert("Review submitted successfully!");
+      }
+
       navigate("/reviewer");
     } catch (err) {
       console.log("Error while submitting review:", err);
-      alert("Could not submit review.");
+      alert(`Could not submit review. ${err.response?.data || ""}`);
     }
   };
-
   return (
     <div className="addReviewWrapper">
       <Header
@@ -99,11 +120,13 @@ export default function AddReview() {
             value={decision}
             onChange={(e) => setDecision(e.target.value)}
           >
-            <MenuItem value="ACCEPTED">ACCEPTED</MenuItem>
-            <MenuItem value="REJECTED">REJECTED</MenuItem>
+           
+            <MenuItem value="APPROVED">ACCEPTED</MenuItem>
+            <MenuItem value="REJECT">REJECTED</MenuItem>
           </TextField>
 
-          {decision === "REJECTED" && (
+         
+          {decision === "REJECT" && (
             <>
               <label className="label">Feedback</label>
               <TextField

@@ -56,10 +56,9 @@ export default function Register() {
         alert(error);
         return;
       }
-      console.log("TRIMIT CATRE BACKEND:", { name, email, password, role });
-
+     
       const data = await registerRequest({ name, email, password, role });
-      //alert(`TRIMIT CATRE BACKEND:, ${name}, ${email}, ${password}, ${role} }`);
+  
       alert("Your account has been created!");
       navigate(`/login`);
     } catch (err) {

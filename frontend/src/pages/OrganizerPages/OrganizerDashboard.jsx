@@ -19,18 +19,19 @@ import {
 import { useState, useEffect } from "react";
 import Header from "../components/Header.jsx";
 import "./OrganizerDashboard.css";
-import { getAllConferences, addConference } from "../../api/conference.js";
+import { api } from "../../api/axiosConfig.js"
 import TablePaginationActions from "../components/TablePaginationActions.jsx";
 export default function OrganizerDashboard() {
   const [conferences, setConferences] = useState([]);
   const [open, setOpen] = useState(false);
+  const [conferenceToEdit, setConferenceToEdit] = useState(null);
 
   useEffect(() => {
     async function loadConferences() {
       try {
-        const data = await getAllConferences();
-        console.log(data);
-        setConferences(data);
+        const response = await api.get("/conferences");
+
+        setConferences(response.data);
       } catch (err) {
         console.log("Error while loading conferences: " + err);
       }
@@ -39,14 +40,26 @@ export default function OrganizerDashboard() {
     loadConferences();
   }, []);
 
+
+
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [openPapers, setOpenPapers] = useState(false);
+  const [papers, setPapers] = useState([]);
 
   const user = JSON.parse(localStorage.getItem("user"));
   const userName = user?.name;
+  const organiserId = user?.id;
 
-  const handleClickOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
+  const handleAdd = () => { setConferenceToEdit(null); setOpen(true); };
+  const handleClose = () => { setConferenceToEdit(null); setOpen(false); }
+
+  const handleModify = (conf) => {
+    setConferenceToEdit(conf);
+    console.log("CONF SELECTED:", conf);
+
+    setOpen(true);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,17 +69,56 @@ export default function OrganizerDashboard() {
     const description = form.get("description");
     const date = form.get("date");
     const time = form.get("time");
+    const location = form.get("location");
 
     try {
-      const created = await addConference(title, description, date, time);
-      setConferences((prev) => [...prev, created]);
+      if (conferenceToEdit != null) {
+        const response = await api.put(`updateConference/${conferenceToEdit.id}`, {
+          title,
+          description,
+          date,
+          time,
+          location,
+          organiserId
+        }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+        setConferences((prev) =>
+          prev.map((c) =>
+            c.id === conferenceToEdit.id
+              ? { ...response.data, participants: c.participants }
+              : c
+          )
+        );
+      }
+      else {
+        const created = await api.post("/createConference", {
+          title,
+          description,
+          date,
+          time,
+          location,
+          organiserId
+        }, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+        const res = await api.get("/conferences");
+  setConferences(res.data);
+      }
       handleClose();
     } catch (err) {
       console.log("Error while creating conference: " + err);
       alert("Could not create conference");
     }
   };
+  async function handleSeePapers(conferenceId) {
+    try {
+      const res = await api.get(`/papersByConference/${conferenceId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setPapers(res.data);
+      setOpenPapers(true);
+    } catch (err) {
+      console.error("Error loading papers:", err);
+    }
 
+  }
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -80,7 +132,7 @@ export default function OrganizerDashboard() {
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - conferences.length) : 0;
   const role = user.role.toLowerCase();
   return (
-    <div className="conferenceWrapper">
+    <div className="organizerWrapper">
       <Header
         userName={userName}
         tabs={[
@@ -90,16 +142,8 @@ export default function OrganizerDashboard() {
         showLogout
       />
 
-      <div className="conferenceContent">
-        <Button
-          variant="contained"
-          className="buttonAddConference"
-          onClick={handleClickOpen}
-        >
-          Add Conference
-        </Button>
-
-        <TableContainer component={Paper} className="conferenceTableCard">
+      <div className="organizerContent">
+        <TableContainer component={Paper} className="organizerTableCard">
           <Table>
             <TableHead>
               <TableRow>
@@ -107,10 +151,7 @@ export default function OrganizerDashboard() {
                   <strong>Title</strong>
                 </TableCell>
                 <TableCell>
-                  <strong>Reviewers</strong>
-                </TableCell>
-                <TableCell>
-                  <strong>See Reviewers</strong>
+                  <strong>Participants</strong>
                 </TableCell>
                 <TableCell>
                   <strong>Modify</strong>
@@ -124,32 +165,21 @@ export default function OrganizerDashboard() {
             <TableBody>
               {conferences.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={5} style={{ textAlign: "center" }}>
+                  <TableCell colSpan={4} style={{ textAlign: "center" }}>
                     There are no conferences yet.
                   </TableCell>
                 </TableRow>
               ) : (
                 (rowsPerPage > 0
                   ? conferences.slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                   : conferences
                 ).map((conf) => (
                   <TableRow key={conf.id}>
                     <TableCell>{conf.title}</TableCell>
-                    <TableCell>{conf.reviewersCount}</TableCell>
-
-                    <TableCell>
-                      <Button
-                        variant="contained"
-                        color="success"
-                        className="buttonTable"
-                        size="small"
-                      >
-                        See Reviewers
-                      </Button>
-                    </TableCell>
+                    <TableCell>{conf.participants ? conf.participants.length : 0}</TableCell>
 
                     <TableCell>
                       <Button
@@ -157,6 +187,7 @@ export default function OrganizerDashboard() {
                         color="primary"
                         className="buttonTable"
                         size="small"
+                        onClick={() => handleModify(conf)}
                       >
                         Modify
                       </Button>
@@ -168,6 +199,7 @@ export default function OrganizerDashboard() {
                         color="secondary"
                         size="small"
                         className="buttonTable"
+                        onClick={() => handleSeePapers(conf.id)}
                       >
                         See Papers
                       </Button>
@@ -204,11 +236,20 @@ export default function OrganizerDashboard() {
             </TableFooter>
           </Table>
         </TableContainer>
-      </div>
+        <div className="btnContainerOrganizer">
+          <Button
+            variant="contained"
+            className="buttonAddConferenceOrganizer"
+            onClick={handleAdd}
+          >
+            Add Conference
+          </Button>
+        </div>
 
-      {/* Dialog add conference */}
+      </div>
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>Add Conference</DialogTitle>
+        <DialogTitle> {conferenceToEdit ? "Update Conference" : "Add Conference"}</DialogTitle>
+
         <DialogContent>
           <DialogContentText>
             Complete all fields to add a new conference.
@@ -220,6 +261,7 @@ export default function OrganizerDashboard() {
               fullWidth
               required
               variant="standard"
+              defaultValue={conferenceToEdit ? conferenceToEdit.title : ""}
             />
             <TextField
               name="description"
@@ -227,6 +269,7 @@ export default function OrganizerDashboard() {
               fullWidth
               required
               variant="standard"
+              defaultValue={conferenceToEdit ? conferenceToEdit.description : ""}
             />
             <TextField
               name="date"
@@ -234,10 +277,20 @@ export default function OrganizerDashboard() {
               fullWidth
               required
               variant="standard"
+              defaultValue={conferenceToEdit ? conferenceToEdit.date : ""}
             />
             <TextField
               name="time"
               label="Time"
+              fullWidth
+              required
+              variant="standard"
+              defaultValue={conferenceToEdit ? conferenceToEdit.time : ""}
+            />
+            <TextField
+              name="location"
+              label="Location"
+              defaultValue={conferenceToEdit ? conferenceToEdit.location : ""}
               fullWidth
               required
               variant="standard"
@@ -248,8 +301,65 @@ export default function OrganizerDashboard() {
         <DialogActions>
           <Button onClick={handleClose}>Cancel</Button>
           <Button type="submit" form="add-form">
-            Add
+            {conferenceToEdit === null ? "Add" : "Update"}
           </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={openPapers} onClose={() => setOpenPapers(false)}>
+        <DialogTitle>List of papers: </DialogTitle>
+
+        <DialogContent>
+
+          {
+            papers.length === 0 ? (<p>No papers submitted yet.</p>) :
+              (<Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>
+                      Title
+                    </TableCell>
+                    <TableCell>
+                      Author
+                    </TableCell>
+                    <TableCell>
+                      File
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+
+                <TableBody>
+
+                  {
+                    papers.map((paper) => {
+                      return (<TableRow key={paper.id}>
+                        <TableCell>
+                          {paper.title}
+                        </TableCell>
+                        <TableCell>
+                          {paper.authors[0]?.name}
+                        </TableCell>
+                        <TableCell>
+                          <a
+                            href={paper.fileUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="tableLink"
+                          >
+                            PDF
+                          </a>
+                        </TableCell>
+                      </TableRow>)
+                    })
+                  }
+                </TableBody>
+              </Table>
+
+              )
+
+          }
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPapers(false)}>Close</Button>
         </DialogActions>
       </Dialog>
     </div>

@@ -1,72 +1,54 @@
-
-.conferenceWrapper{
+.organizerWrapper {
   background: #f7e9ef;
+  min-width: 100vw;
   height: 100vh;
 }
 
-.conferenceContent{
+.btnContainerOrganizer {
   display: flex;
-  flex-direction: column;
-  margin-top: 30px;
-  flex-wrap: wrap;
-  gap:2rem;
+  align-items: flex-start;
+  width: 30%;
 }
 
-.conferenceTableCard{
-  background: white;
+.buttonAddConferenceOrganizer {
+  background: #923e57 !important;
+  color: white !important;
+  height: 50px;
+  border-radius: 8px !important;
+  padding: 0 20px !important;
+  margin: 0;
 }
-.buttonAddConference {
+
+.buttonTable {
   background: #b14c6c !important;
   color: white !important;
   border-radius: 6px !important;
   padding: 4px 14px !important;
-  width: 10rem;
-  align-content: center;
-  justify-self: center;
-}
-.buttonTable{
-background: #b14c6c !important;
-  color: white !important;
-  border-radius: 6px !important;
-  padding: 4px 14px !important;
 }
 
-@media(min-width:1250px) {
-  .conferenceWrapper {
-  min-height: 100vh;
-  min-width: 100vw;
-}
-
-.conferenceContent {
+.organizerContent {
   margin-top: 3rem;
   display: flex;
-  flex-direction: row-reverse;
-  justify-content: center;
+  flex-direction: row;
   width: 100%;
+  gap: 2rem;
+  padding: 1rem;
 }
 
-.conferenceTableCard {
-  padding: 2rem;
+.organizerTableCard {
   border-radius: 15px;
   width: 80%;
   max-width: 1000px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.buttonTable{
-background: #b14c6c !important;
-  color: white !important;
-  border-radius: 6px !important;
-  padding: 4px 14px !important;
-}
-
-.conferenceTable{
+.organizerTable {
   width: 100%;
   border-collapse: collapse;
 }
 
-.conferenceTable th,
-.conferenceTable td {
+.organizerTable th,
+.organizerTable td {
   padding: 12px 14px;
   border-bottom: 1px solid #ddd;
   text-align: center;
@@ -75,13 +57,4 @@ background: #b14c6c !important;
 .tableLink {
   color: #b14c6c;
   font-weight: 600;
-}
-
-.buttonAddConference {
-  background: #b14c6c !important;
-  color: white !important;
-  border-radius: 6px !important;
-  padding: 4px 14px !important;
-  height: 4rem;
-}
 }
