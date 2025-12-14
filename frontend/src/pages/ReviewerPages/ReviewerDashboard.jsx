@@ -38,8 +38,15 @@ export default function ReviewerDashboard() {
         const response = await api.get("/papersAssignedToMe", {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
+        const pendingPapers = response.data.filter((paper) => {
+          const myActiveReview = paper.paperReviews?.find(
+            (r) => r.isActive && r.decision === "REVISE"
+          );
 
-        setPapersToReview(response.data);
+          return !!myActiveReview;
+        });
+
+        setPapersToReview(pendingPapers);
       } catch (err) {
         console.log("Error loading assigned papers", err);
       }

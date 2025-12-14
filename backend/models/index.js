@@ -92,10 +92,11 @@ Review.belongsTo(Paper, { foreignKey: "paperId", onDelete: "CASCADE" });
 //paper_reviewer
 User.belongsToMany(Paper, {
   through: PaperReviewer,
-  foreignKey: "paperId",
+  foreignKey: "userId",
   as: "assignedPapers",
   onDelete: "CASCADE",
 });
+
 Paper.belongsToMany(User, {
   through: PaperReviewer,
   foreignKey: "paperId",

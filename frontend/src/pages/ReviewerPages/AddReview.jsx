@@ -13,41 +13,59 @@ export default function AddReview() {
   const name = user.name;
 
   const [paper, setPaper] = useState(null);
+  const [reviewId, setReviewId] = useState(null);
   const [decision, setDecision] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function loadPaper() {
+    async function loadData() {
       try {
-        const response = await api.get(`/paper/${id}`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
+        const token = localStorage.getItem("token");
+        const config = { headers: { Authorization: `Bearer ${token}` } };
 
-        setPaper(response.data);
+        const paperResponse = await api.get(`/paper/${id}`, config);
+        setPaper(paperResponse.data);
+
+        const reviewsResponse = await api.get(
+          `/reviewByReviewerId/${user.id}`,
+          config
+        );
+
+        const myReview = reviewsResponse.data.find(
+          (r) => r.paperId === parseInt(id) && r.isActive === true
+        );
+
+        if (myReview) {
+          setReviewId(myReview.id);
+          if (myReview.decision !== "REVISE") setDecision(myReview.decision);
+          if (!myReview.feedback.includes("Review pending"))
+            setFeedback(myReview.feedback);
+        } else {
+          console.error("Nu am gasit review placeholder!");
+        }
+
+        setLoading(false);
       } catch (err) {
-        console.log("Error loading paper:", err);
-        alert("Could not load paper data.");
+        console.log("Error loading data:", err);
+        alert("Could not load data.");
+        setLoading(false);
       }
     }
 
-    loadPaper();
-  }, [id]);
+    loadData();
+  }, [id, user.id]);
 
   const validations = () => {
-    if (!paper) return "Paper must be loaded";
-
     if (!decision) return "Please select a decision before submitting.";
 
-  
     if (decision === "REJECT") {
       if (!feedback.trim())
         return "Feedback is required when the paper is rejected.";
-
       if (feedback.trim().length < 10)
         return "Feedback must contain at least 10 characters.";
     }
-
-    return null; 
+    return null;
   };
 
   const handleSubmit = async () => {
@@ -60,47 +78,23 @@ export default function AddReview() {
     try {
       const token = localStorage.getItem("token");
       const config = { headers: { Authorization: `Bearer ${token}` } };
-      await api.post(
-        "/createReview",
+      await api.put(
+        `/reviewUpdate/${reviewId}`,
         {
-          feedback,
-          decision,
-          paperId: paper.id,
-          userId: user.id,
+          feedback: feedback,
+          decision: decision,
         },
         config
       );
-
-      let reviews = [];
-      try {
-        const reviewsResponse = await api.get(`/reviewByPaperId/${paper.id}`, config);
-        reviews = reviewsResponse.data;
-      } catch (e) {
-        console.log("Nu am putut prelua review-urile sau e primul review.");
-      }
-
-      if (reviews.length === 2) {
-        const allApproved = reviews.every((r) => r.decision === "APPROVED");
-        
-        const newPaperStatus = allApproved ? "ACCEPTED" : "REJECTED";
-
-        await api.put(
-          `/updatePaper/${paper.id}`,
-          { status: newPaperStatus },
-          config
-        );
-        
-        alert(`Review submitted! Paper status updated to: ${newPaperStatus}`);
-      } else {
-        alert("Review submitted successfully!");
-      }
-
+      alert("Review submitted successfully!");
       navigate("/reviewer");
     } catch (err) {
       console.log("Error while submitting review:", err);
       alert(`Could not submit review. ${err.response?.data || ""}`);
     }
   };
+
+  if (loading) return <div>Loading...</div>;
   return (
     <div className="addReviewWrapper">
       <Header
@@ -120,12 +114,10 @@ export default function AddReview() {
             value={decision}
             onChange={(e) => setDecision(e.target.value)}
           >
-           
             <MenuItem value="APPROVED">ACCEPTED</MenuItem>
             <MenuItem value="REJECT">REJECTED</MenuItem>
           </TextField>
 
-         
           {decision === "REJECT" && (
             <>
               <label className="label">Feedback</label>
