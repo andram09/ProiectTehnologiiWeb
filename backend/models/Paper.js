@@ -13,7 +13,7 @@ export const Paper=db.define("Paper",
             allowNull: false
         },
         fileUrl:{
-            type:DataTypes.STRING
+            type:DataTypes.TEXT
         },
         status:{
             type:DataTypes.ENUM("UNDER_REVIEW", "ACCEPTED", "REJECTED"),

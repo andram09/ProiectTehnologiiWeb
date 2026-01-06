@@ -4,33 +4,29 @@ import { Author } from "../models/Author.js";
 import { User } from "../models/User.js";
 import { Review } from "../models/index.js";
 import { ConferenceAttendance } from "../models/index.js";
-const SERVER_URL = process.env.SERVER_URL;
 import { db } from "../models/index.js";
 
 export const controller = {
   createPaper: async (req, res) => {
     try {
-     
       const { title, conferenceId, status } = req.body;
       const userId = req.user.id;
 
       if (!req.file) return res.status(400).send("No file uploaded");
-  
+
       const newPaper = await Paper.create({
         title,
         conferenceId,
-        fileUrl: `${SERVER_URL}/uploads/${req.file.filename}`,
+        fileUrl: req.file.path,
         status: status || "UNDER_REVIEW",
       });
 
-      
       await Author.create({
         paperId: newPaper.id,
         userId: userId,
         isMainAuthor: true,
       });
 
-      
       const exists = await ConferenceAttendance.findOne({
         where: { userId: userId, conferenceId },
       });
@@ -38,41 +34,37 @@ export const controller = {
         await ConferenceAttendance.create({ userId, conferenceId });
       }
 
-      
       const reviewers = await User.findAll({
         where: { role: "REVIEWER" },
         order: db.random(),
         limit: 2,
       });
 
-    
       await newPaper.addAssignedReviewers(reviewers);
 
-      
       if (reviewers.length > 0) {
         const reviewPromises = reviewers.map((reviewer) => {
           return Review.create({
             userId: reviewer.id,
             paperId: newPaper.id,
-            feedback: "Review pending initiation...", 
+            feedback: "Review pending initiation...",
             decision: "REVISE",
-            isActive: true
+            isActive: true,
           });
         });
         await Promise.all(reviewPromises);
       }
-      
 
       res.status(201).json({
         message: "Paper uploaded and reviewers assigned!",
-        fileUrl: `${SERVER_URL}/uploads/${req.file.filename}`,
+        fileUrl: req.file.path,
       });
     } catch (err) {
       res.status(500).send(`Eroare la crearea lucrarii: ${err}`);
     }
   },
 
-   getAllPapers: async (req, res) => {
+  getAllPapers: async (req, res) => {
     try {
       const papers = await Paper.findAll({
         include: [
@@ -92,10 +84,10 @@ export const controller = {
       res.status(500).send(`Eroare la preluarea tuturor lucrarilor ${err}`);
     }
   },
-  getPaperById:async(req,res)=>{
+  getPaperById: async (req, res) => {
     try {
       const { id } = req.params;
-      
+
       const paper = await Paper.findByPk(id, {
         include: [
           {
@@ -105,9 +97,9 @@ export const controller = {
             through: { attributes: [] },
           },
           {
-             model: Conference,
-             attributes: ["title"] 
-          }
+            model: Conference,
+            attributes: ["title"],
+          },
         ],
       });
 
@@ -154,8 +146,8 @@ export const controller = {
         where: { conferenceId: conferenceId },
         include: {
           model: User,
-          as:"authors",
-          attributes:["id","name","email"],
+          as: "authors",
+          attributes: ["id", "name", "email"],
           through: {
             model: Author,
             attributes: [],
@@ -163,77 +155,59 @@ export const controller = {
         },
       });
 
-      
       res.status(200).json(papers);
     } catch (err) {
       res.status(500).send(`Eroare la preluarea tuturor lucrarilor ${err}`);
     }
   },
 
- updatePaper: async (req, res) => {
+  updatePaper: async (req, res) => {
     try {
       const paperId = req.params.id;
-      const { title, conferenceId, status } = req.body;
+      const { title, conferenceId } = req.body;
       const userRole = req.user.role.toUpperCase();
 
       const paper = await Paper.findByPk(paperId);
-      if (!paper) return res.status(404).send("Nu am gasit lucrarea");
+      if (!paper) return res.status(404).send("Paper not found");
 
       let newFileUrl = paper.fileUrl;
       if (req.file) {
-        newFileUrl = `${process.env.SERVER_URL}/uploads/${req.file.filename}`;
+        newFileUrl = req.file.path;
       }
 
       if (userRole === "AUTHOR") {
+        // 1. update paper
         await paper.update({
           title: title ?? paper.title,
           conferenceId: conferenceId ?? paper.conferenceId,
           fileUrl: newFileUrl,
-          status: "UNDER_REVIEW" 
+          status: "UNDER_REVIEW",
         });
-        
-const activeReviews = await Review.findAll({
-  where: { 
-    paperId: paper.id, 
-    isActive: true 
-  },
-  attributes: ['userId']
-});
+        //punem pe isActive false review urile anterioare
+        await Review.update(
+          { isActive: false },
+          { where: { paperId: paper.id, isActive: true } }
+        );
 
-const activeReviewerIds = activeReviews.map(r => r.userId);
+        // 3. ia reviewerii asignati paperului
+        const reviewers = await paper.getAssignedReviewers();
 
-
-await Review.update(
-  { isActive: false },
-  { where: { paperId: paper.id, isActive: true } }
-);
-
-
-if (activeReviewerIds.length > 0) {
-  const reviewPromises = activeReviewerIds.map((userId) => {
-    return Review.create({
-      userId: userId, 
-      paperId: paper.id,
-      feedback: "Updated version - Review pending...",
-      decision: "REVISE",
-      isActive: true
-    });
-  });
-  await Promise.all(reviewPromises);
-}
-
-      } else if (userRole === "REVIEWER") {
-        await paper.update({
-          status: status ?? paper.status,
-        });
-      } else {
-        return res.status(403).send("Nu poti modifica aceasta lucrare");
+        // 4. creeaza review-uri NOI
+        for (const reviewer of reviewers) {
+          await Review.create({
+            userId: reviewer.id,
+            paperId: paper.id,
+            feedback: "Updated version - review pending...",
+            decision: "REVISE",
+            isActive: true,
+          });
+        }
       }
 
       res.status(200).json(paper);
     } catch (err) {
       console.error(err);
-      res.status(500).send(`Eroare la update paper: ${err}`);
+      res.status(500).send("Error updating paper");
     }
   },
 
@@ -270,11 +244,11 @@ if (activeReviewerIds.length > 0) {
               attributes: ["id", "name"],
             },
             {
-              model: Review, 
-              as:"paperReviews",
+              model: Review,
+              as: "paperReviews",
               required: false,
-              where: { userId: reviewerId }, 
-            }
+              where: { userId: reviewerId },
+            },
           ],
         },
       });
