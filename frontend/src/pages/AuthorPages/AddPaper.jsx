@@ -1,9 +1,11 @@
 import { TextField, Button, MenuItem } from "@mui/material";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { api } from "../../api/axiosConfig.js";
 import "./AddPaper.css";
 
 export default function AddPaper() {
+  const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [conferenceId, setConferenceId] = useState("");
   const [file, setFile] = useState(null);
@@ -60,7 +62,7 @@ export default function AddPaper() {
         },
       });
 
-      window.location.href = "./";
+      navigate("/author");
     } catch (error) {
       alert("Error while uploading the file!");
     }

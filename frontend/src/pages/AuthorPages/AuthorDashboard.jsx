@@ -17,13 +17,37 @@ import {
   Paper,
   TableFooter,
   TablePagination,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
 } from "@mui/material";
-
 
 export default function AuthorDashboard() {
   const [papers, setPapers] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [open, setOpen] = useState(false);
+  const [selectedFeedback, setSelectedFeedback] = useState("");
+
+  const handleOpenFeedback = async (paperId) => {
+    try {
+      const response = await api.get(`/reviewByPaperId/${paperId}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      const toateFeedbackurile = response.data
+        .map((r) => `REVIEW: ${r.feedback}`)
+        .join("\n\n---\n\n");
+
+      setSelectedFeedback(toateFeedbackurile);
+    } catch (error) {
+      setSelectedFeedback("Nu exista feedback momentan");
+    }
+    setOpen(true);
+  };
+  const handleClose = () => {
+    setOpen(false);
+  };
   const user = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
@@ -67,8 +91,6 @@ export default function AuthorDashboard() {
       />
 
       <div className="contentArea">
-
-
         <TableContainer component={Paper} className="tabelCard">
           <Table>
             <TableHead>
@@ -112,16 +134,13 @@ export default function AuthorDashboard() {
                     <TableCell>{paper.status}</TableCell>
 
                     <TableCell>
-                      {paper.feedback ? (
-                        <Link
-                          className="tableLink"
-                          to={`/author/feedback/${paper.id}`}
-                        >
-                          View
-                        </Link>
-                      ) : (
-                        "-"
-                      )}
+                      <Button
+                        variant="text"
+                        onClick={() => handleOpenFeedback(paper.id)}
+                        className="modifyBtn"
+                      >
+                        View
+                      </Button>
                     </TableCell>
 
                     <TableCell>
@@ -175,6 +194,15 @@ export default function AuthorDashboard() {
             </TableFooter>
           </Table>
         </TableContainer>
+        <Dialog open={open} onClose={handleClose} fullWidth>
+          <DialogTitle>Feedback</DialogTitle>
+          <DialogContent dividers>
+            <div style={{ whiteSpace: "pre-line" }}>{selectedFeedback}</div>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Close</Button>
+          </DialogActions>
+        </Dialog>
         <div className="btnContainer">
           <Button
             variant="contained"

@@ -76,7 +76,7 @@ export default function Conferences() {
         userName={user.name}
         tabs={[
           { label: "Dashboard", to: `../${role}` },
-          { label: "Profile", to: `./profile` },
+          { label: "Profile", to: `../${role}/profile` },
         ]}
         showBack={true}
         showLogout={true}

@@ -55,7 +55,6 @@ export default function EditPaper() {
           "Content-Type": "multipart/form-data",
         },
       });
-  
 
       navigate("/author");
     } catch (err) {

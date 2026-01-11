@@ -6,9 +6,10 @@ export const db = new Sequelize(
   process.env.DB_USER,
   process.env.DB_PASS,
   {
-    host: "localhost",
+    host: process.env.DB_HOST,
     dialect: "mysql",
-    // dialectOptions: { ssl: { require: true, rejectUnauthorized: true } },
+    port: process.env.DB_PORT,
+    dialectOptions: { ssl: { require: true, rejectUnauthorized: false} },
     sync: true,
     logging: false,
   }

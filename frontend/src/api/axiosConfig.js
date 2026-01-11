@@ -1,4 +1,5 @@
 import axios from "axios";
 export const api = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: "https://proiect-tehnologiiweb-conferinte.azurewebsites.net/api",
+  withCredentials: true,
 });

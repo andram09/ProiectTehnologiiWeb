@@ -5,19 +5,19 @@ import { useState } from "react";
 export default function Header({ userName, tabs = [], showLogout = true }) {
   const handleLogout = () => {
     localStorage.removeItem("token");
-    localStorage.removeItem("user")
+    localStorage.removeItem("user");
     window.location.href = "/";
   };
 
-  const [isOpen,setIsOpen]=useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
-  const toggleMenu=()=>{
-    setIsOpen(!isOpen)
-  }
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div className="headerWrapper">
-      <h2 className="headerWelcome">Bun venit, {userName}!</h2>
+      <h2 className="headerWelcome">Welcome, {userName}!</h2>
 
       <button className="hamburgerBtn" onClick={toggleMenu}>
         ☰
